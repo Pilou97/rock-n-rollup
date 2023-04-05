@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "rock-n-rollup",
+    "kernel-macro",
+    "examples/hello-world"
+]
