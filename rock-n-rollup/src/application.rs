@@ -1,12 +1,15 @@
 use crate::{Input, Runtime};
 
-trait FromExternal {
-    fn from_external<R: Runtime>(runtime: &mut R, input: Input) -> Self;
+pub trait FromInput
+where
+    Self: Sized,
+{
+    fn from_input<R: Runtime>(runtime: &mut R, input: Input) -> Result<Self, ()>;
 }
 
-impl FromExternal for Input {
-    fn from_external<R: Runtime>(_: &mut R, input: Input) -> Self {
-        input
+impl FromInput for Input {
+    fn from_input<R: Runtime>(_: &mut R, input: Input) -> Result<Self, ()> {
+        Ok(input)
     }
 }
 
@@ -31,12 +34,15 @@ impl<R, F, T> IntoHandler<R, T> for F
 where
     R: Runtime,
     F: Fn(&mut R, T) + 'static,
-    T: FromExternal,
+    T: FromInput,
 {
     fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
         Box::new(move |runtime, input: Input| {
-            let arg1 = T::from_external(runtime, input);
-            (self)(runtime, arg1)
+            let arg1 = T::from_input(runtime, input);
+            match arg1 {
+                Ok(arg1) => (self)(runtime, arg1),
+                _ => (),
+            }
         })
     }
 }
@@ -46,14 +52,17 @@ impl<R, F, T1, T2> IntoHandler<R, (T1, T2)> for F
 where
     R: Runtime,
     F: Fn(&mut R, T1, T2) + 'static,
-    T1: FromExternal,
-    T2: FromExternal,
+    T1: FromInput,
+    T2: FromInput,
 {
     fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
         Box::new(move |runtime, input| {
-            let arg1 = T1::from_external(runtime, input.clone());
-            let arg2 = T2::from_external(runtime, input);
-            (self)(runtime, arg1, arg2)
+            let arg1 = T1::from_input(runtime, input.clone());
+            let arg2 = T2::from_input(runtime, input);
+            match (arg1, arg2) {
+                (Ok(arg1), Ok(arg2)) => (self)(runtime, arg1, arg2),
+                _ => (),
+            }
         })
     }
 }
