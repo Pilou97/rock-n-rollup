@@ -36,6 +36,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "read-input"
+version = "0.1.0"
+dependencies = [
+ "rock-n-rollup",
+]
+
+[[package]]
 name = "rock-n-rollup"
 version = "0.1.0"
 dependencies = [
