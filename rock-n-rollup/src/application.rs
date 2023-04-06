@@ -10,35 +10,50 @@ impl FromExternal for Input {
     }
 }
 
-pub trait IntoHandler<T> {
-    fn make_handler<R: Runtime>(self) -> Box<dyn FnMut(&mut R, Input)>;
+pub trait IntoHandler<R, T>
+where
+    R: Runtime,
+{
+    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)>;
 }
 
-impl<F, T> IntoHandler<T> for F
+impl<F, R> IntoHandler<R, ()> for F
 where
-    F: Fn(T) + 'static,
+    R: Runtime,
+    F: Fn(&mut R) + 'static,
+{
+    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
+        Box::new(move |runtime, _: Input| (self)(runtime))
+    }
+}
+
+impl<R, F, T> IntoHandler<R, T> for F
+where
+    R: Runtime,
+    F: Fn(&mut R, T) + 'static,
     T: FromExternal,
 {
-    fn make_handler<R: Runtime>(self) -> Box<dyn FnMut(&mut R, Input)> {
+    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
         Box::new(move |runtime, input: Input| {
             let arg1 = T::from_external(runtime, input);
-            (self)(arg1)
+            (self)(runtime, arg1)
         })
     }
 }
 
 /// Implemented for handlers taking two argument.
-impl<F, T1, T2> IntoHandler<(T1, T2)> for F
+impl<R, F, T1, T2> IntoHandler<R, (T1, T2)> for F
 where
-    F: Fn(T1, T2) + 'static,
+    R: Runtime,
+    F: Fn(&mut R, T1, T2) + 'static,
     T1: FromExternal,
     T2: FromExternal,
 {
-    fn make_handler<R: Runtime>(self) -> Box<dyn FnMut(&mut R, Input)> {
+    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
         Box::new(move |runtime, input| {
             let arg1 = T1::from_external(runtime, input.clone());
             let arg2 = T2::from_external(runtime, input);
-            (self)(arg1, arg2)
+            (self)(runtime, arg1, arg2)
         })
     }
 }
@@ -64,7 +79,7 @@ where
 
     pub fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
-        F: IntoHandler<Marker> + 'static,
+        F: IntoHandler<R, Marker> + 'static,
     {
         let fct = transition.make_handler();
 
