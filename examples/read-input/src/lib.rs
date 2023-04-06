@@ -1,14 +1,12 @@
-use rock_n_rollup::{Application, Input, Logger, Runtime};
+use rock_n_rollup::{App, Input, Logger};
 
-pub fn transition<R: Runtime>(runtime: &mut R, input: Input) {
-    runtime.info(&format!(
-        "The input is at level {} at index {}",
-        input.level, input.id
-    ));
+pub fn transition<L: Logger>(logger: &mut L, input: Input) {
+    let Input { level, id, .. } = input;
+    let msg = format!("The input is at level {} at index {}", level, id);
+    logger.info(&msg);
 }
 
 #[rock_n_rollup::main]
-pub fn main<R: Runtime + Logger + 'static>(runtime: &mut R) {
-    let mut app = Application::new(runtime);
+pub fn main<Application: App>(app: &mut Application) {
     app.register(transition).run();
 }

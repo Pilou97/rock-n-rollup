@@ -58,6 +58,16 @@ where
     }
 }
 
+pub trait App {
+    type R: Runtime + 'static;
+
+    fn register<F, Marker>(&mut self, transition: F) -> &mut Self
+    where
+        F: IntoHandler<Self::R, Marker> + 'static;
+
+    fn run(&mut self);
+}
+
 pub struct Application<'a, R>
 where
     R: Runtime,
@@ -66,18 +76,10 @@ where
     transitions: Vec<Box<dyn FnMut(&mut R, Input)>>,
 }
 
-impl<'a, R> Application<'a, R>
-where
-    R: Runtime,
-{
-    pub fn new(runtime: &'a mut R) -> Self {
-        Self {
-            runtime,
-            transitions: Vec::default(),
-        }
-    }
+impl<'a, R: Runtime + 'static> App for Application<'a, R> {
+    type R = R;
 
-    pub fn register<F, Marker>(&mut self, transition: F) -> &mut Self
+    fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
         F: IntoHandler<R, Marker> + 'static,
     {
@@ -87,7 +89,7 @@ where
         self
     }
 
-    pub fn run(&mut self) {
+    fn run(&mut self) {
         let mut is_running = true;
         while is_running {
             let input = self.runtime.next_input();
@@ -100,6 +102,18 @@ where
                         .for_each(|transition| transition(self.runtime, input.clone()));
                 }
             }
+        }
+    }
+}
+
+impl<'a, R> Application<'a, R>
+where
+    R: Runtime,
+{
+    pub fn new(runtime: &'a mut R) -> Self {
+        Self {
+            runtime,
+            transitions: Vec::default(),
         }
     }
 }

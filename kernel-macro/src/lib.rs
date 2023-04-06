@@ -15,7 +15,9 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
         #[export_name = "kernel_run"]
         pub extern "C" fn kernel_run() {
             let mut runtime = rock_n_rollup::KernelRuntime::new();
-            #fn_name(&mut runtime);
+            let mut app = rock_n_rollup::Application::new(&mut runtime);
+
+            #fn_name(&mut app);
         }
 
         #input_fn
