@@ -2,8 +2,9 @@ use rock_n_rollup::{
     plugins::{
         external::External,
         internal::{EndOfLevel, InfoPerLevel, Internal, StartOfLevel},
+        logger::Logger,
     },
-    App, Input, Logger,
+    App, Input,
 };
 
 /// This function will be call each time
