@@ -1,12 +1,25 @@
 use crate::core::{FromInput, Input, Runtime};
 
-pub struct External<T> {
+pub trait FromExternal
+where
+    Self: Sized,
+{
+    fn from_external(input: Vec<u8>) -> Result<Self, ()>;
+}
+
+pub struct External<T>
+where
+    T: FromExternal,
+{
     level: u32,
     id: u32,
     payload: T,
 }
 
-impl<T> External<T> {
+impl<T> External<T>
+where
+    T: FromExternal,
+{
     pub fn level(&self) -> u32 {
         self.level
     }
@@ -20,13 +33,29 @@ impl<T> External<T> {
     }
 }
 
-impl FromInput for External<String> {
+impl<T> FromInput for External<T>
+where
+    T: FromExternal,
+{
     fn from_input<R: Runtime>(_: &mut R, input: Input) -> Result<Self, ()> {
-        let payload = String::from_utf8(input.payload).map_err(|_| ())?;
-        Ok(External {
-            level: input.level,
-            id: input.id,
-            payload,
-        })
+        // First we need to make sure it starts by 0x01
+        match input.payload[..] {
+            [0x01, ..] => {
+                let payload = input.payload.iter().skip(1).copied().collect::<Vec<u8>>();
+                let payload = T::from_external(payload)?;
+                Ok(External {
+                    level: input.level,
+                    id: input.id,
+                    payload,
+                })
+            }
+            _ => Err(()),
+        }
+    }
+}
+
+impl FromExternal for String {
+    fn from_external(input: Vec<u8>) -> Result<Self, ()> {
+        String::from_utf8(input).map_err(|_| ())
     }
 }
