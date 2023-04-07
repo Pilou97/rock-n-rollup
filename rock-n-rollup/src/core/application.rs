@@ -1,4 +1,4 @@
-use super::{Input, Runtime};
+use super::{middleware::Middleware, Input, Runtime};
 
 pub trait FromInput
 where
@@ -74,6 +74,8 @@ pub trait App {
     where
         F: IntoTransition<Self::R, Marker> + 'static;
 
+    fn wrap(&mut self, middleware: impl Middleware + 'static) -> &mut Self;
+
     fn run(&mut self);
 }
 
@@ -83,6 +85,7 @@ where
 {
     runtime: &'a mut R,
     transitions: Vec<Box<dyn FnMut(&mut R, Input)>>,
+    middleware: Vec<Box<dyn Middleware>>,
 }
 
 impl<'a, R: Runtime + 'static> App for Application<'a, R> {
@@ -98,6 +101,11 @@ impl<'a, R: Runtime + 'static> App for Application<'a, R> {
         self
     }
 
+    fn wrap(&mut self, middleware: impl Middleware + 'static) -> &mut Self {
+        self.middleware.push(Box::new(middleware));
+        self
+    }
+
     fn run(&mut self) {
         let mut is_running = true;
         while is_running {
@@ -105,10 +113,19 @@ impl<'a, R: Runtime + 'static> App for Application<'a, R> {
             match input {
                 None => is_running = false,
                 Some(input) => {
-                    let _ = self
-                        .transitions
-                        .iter_mut()
-                        .for_each(|transition| transition(self.runtime, input.clone()));
+                    let input = self.middleware.iter().fold(Ok(input), |input, middleware| {
+                        input.and_then(|input| middleware.upgrade(input))
+                    });
+
+                    match input {
+                        Err(_) => {}
+                        Ok(input) => {
+                            let _ = self
+                                .transitions
+                                .iter_mut()
+                                .for_each(|transition| transition(self.runtime, input.clone()));
+                        }
+                    }
                 }
             }
         }
@@ -123,6 +140,7 @@ where
         Self {
             runtime,
             transitions: Vec::default(),
+            middleware: Vec::default(),
         }
     }
 }

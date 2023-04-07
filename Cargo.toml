@@ -4,5 +4,6 @@ members = [
     "rock-n-rollup",
     "kernel-macro",
     "examples/hello-world",
-    "examples/read-input"
+    "examples/read-input",
+    "examples/magic-byte"
 ]
