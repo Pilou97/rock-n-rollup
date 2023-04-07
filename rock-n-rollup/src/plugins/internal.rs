@@ -13,7 +13,7 @@ where
 {
     level: u32,
     id: u32,
-    inner: T,
+    payload: T,
 }
 
 impl<T: FromInternal> Internal<T> {
@@ -26,7 +26,7 @@ impl<T: FromInternal> Internal<T> {
     }
 
     pub fn payload(&self) -> &T {
-        &self.inner
+        &self.payload
     }
 }
 
@@ -63,11 +63,11 @@ impl FromInternal for EndOfLevel {
 
 impl<T: FromInternal> FromInput for Internal<T> {
     fn from_input<R: Runtime>(_: &mut R, input: Input) -> Result<Self, ()> {
-        let inner = T::from_internal(input.payload)?;
+        let payload = T::from_internal(input.payload)?;
         Ok(Internal {
             level: input.level,
             id: input.id,
-            inner,
+            payload,
         })
     }
 }
