@@ -1,4 +1,4 @@
-use crate::Runtime;
+use crate::core::Runtime;
 
 pub trait Logger {
     fn info(&mut self, msg: &str);

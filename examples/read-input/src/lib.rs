@@ -1,10 +1,10 @@
 use rock_n_rollup::{
+    core::{App, Input},
     plugins::{
         external::External,
         internal::{EndOfLevel, InfoPerLevel, Internal, StartOfLevel},
         logger::Logger,
     },
-    App, Input,
 };
 
 /// This function will be call each time

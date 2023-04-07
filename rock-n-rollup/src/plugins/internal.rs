@@ -1,4 +1,4 @@
-use crate::{FromInput, Input, Runtime};
+use crate::core::{FromInput, Input, Runtime};
 
 pub trait FromInternal
 where

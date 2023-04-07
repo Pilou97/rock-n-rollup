@@ -28,8 +28,8 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
             quote! {
                 #[export_name = "kernel_run"]
                 pub extern "C" fn kernel_run() {
-                    let mut runtime = rock_n_rollup::KernelRuntime::new();
-                    let mut app = rock_n_rollup::Application::new(&mut runtime);
+                    let mut runtime = rock_n_rollup::core::KernelRuntime::new();
+                    let mut app = rock_n_rollup::core::Application::new(&mut runtime);
 
                     #fn_name(&mut app);
                 }
@@ -41,7 +41,7 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
             quote! {
                 #[export_name = "kernel_run"]
                 pub extern "C" fn kernel_run() {
-                    let mut runtime = rock_n_rollup::KernelRuntime::new();
+                    let mut runtime = rock_n_rollup::core::KernelRuntime::new();
                     #fn_name(&mut runtime);
                 }
 

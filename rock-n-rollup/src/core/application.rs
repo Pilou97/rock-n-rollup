@@ -1,4 +1,4 @@
-use crate::{Input, Runtime};
+use super::{Input, Runtime};
 
 pub trait FromInput
 where
