@@ -3,8 +3,16 @@ name = "rock-n-rollup"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+all = ["external", "internal", "logger", "magic-byte"]
+external = []
+internal = []
+logger = []
+magic-byte = []
+
 [lib]
 crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 kernel-macro = {path="../kernel-macro"}
+
