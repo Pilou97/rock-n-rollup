@@ -13,30 +13,30 @@ impl FromInput for Input {
     }
 }
 
-pub trait IntoHandler<R, T>
+pub trait IntoTransition<R, T>
 where
     R: Runtime,
 {
-    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)>;
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)>;
 }
 
-impl<F, R> IntoHandler<R, ()> for F
+impl<F, R> IntoTransition<R, ()> for F
 where
     R: Runtime,
     F: Fn(&mut R) + 'static,
 {
-    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)> {
         Box::new(move |runtime, _: Input| (self)(runtime))
     }
 }
 
-impl<R, F, T> IntoHandler<R, T> for F
+impl<R, F, T> IntoTransition<R, T> for F
 where
     R: Runtime,
     F: Fn(&mut R, T) + 'static,
     T: FromInput,
 {
-    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)> {
         Box::new(move |runtime, input: Input| {
             let arg1 = T::from_input(runtime, input);
             match arg1 {
@@ -47,15 +47,15 @@ where
     }
 }
 
-/// Implemented for handlers taking two argument.
-impl<R, F, T1, T2> IntoHandler<R, (T1, T2)> for F
+/// Implemented for transition taking two argument.
+impl<R, F, T1, T2> IntoTransition<R, (T1, T2)> for F
 where
     R: Runtime,
     F: Fn(&mut R, T1, T2) + 'static,
     T1: FromInput,
     T2: FromInput,
 {
-    fn make_handler(self) -> Box<dyn FnMut(&mut R, Input)> {
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)> {
         Box::new(move |runtime, input| {
             let arg1 = T1::from_input(runtime, input.clone());
             let arg2 = T2::from_input(runtime, input);
@@ -72,7 +72,7 @@ pub trait App {
 
     fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
-        F: IntoHandler<Self::R, Marker> + 'static;
+        F: IntoTransition<Self::R, Marker> + 'static;
 
     fn run(&mut self);
 }
@@ -90,9 +90,9 @@ impl<'a, R: Runtime + 'static> App for Application<'a, R> {
 
     fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
-        F: IntoHandler<R, Marker> + 'static,
+        F: IntoTransition<R, Marker> + 'static,
     {
-        let fct = transition.make_handler();
+        let fct = transition.into_transition();
 
         self.transitions.push(fct);
         self
