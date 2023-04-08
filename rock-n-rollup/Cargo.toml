@@ -4,15 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-all = ["external", "internal", "logger", "magic-byte"]
+all = ["external", "internal", "logger", "magic-byte", "database"]
 external = []
 internal = []
 logger = []
 magic-byte = []
+database = []
 
 [lib]
 crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 kernel-macro = {path="../kernel-macro"}
-
+bincode = "1.3.3"
+serde = "1.0.159"

@@ -1,3 +1,5 @@
+#[cfg(feature = "database")]
+pub mod database;
 #[cfg(feature = "external")]
 pub mod external;
 #[cfg(feature = "internal")]

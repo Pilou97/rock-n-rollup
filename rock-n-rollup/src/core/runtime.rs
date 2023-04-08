@@ -63,16 +63,16 @@ pub trait Runtime {
     fn next_input(&mut self) -> Option<Input>;
 
     /// Returns true if something is present under the following path
-    fn is_present(&mut self, path: &str) -> bool;
+    fn store_is_present(&mut self, path: &str) -> bool;
 
     /// Deletes the path at the following location
-    fn delete(&mut self, path: &str) -> Result<(), ()>;
+    fn store_delete(&mut self, path: &str) -> Result<(), ()>;
 
     /// Read some data at a given path
-    fn read(&mut self, path: &str) -> Option<Vec<u8>>;
+    fn store_read(&mut self, path: &str) -> Option<Vec<u8>>;
 
     /// Write some data at a given path
-    fn write(&mut self, path: &str, data: &Vec<u8>) -> Result<(), ()>;
+    fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()>;
 }
 
 pub struct KernelRuntime {}
@@ -110,7 +110,7 @@ impl Runtime for KernelRuntime {
         }
     }
 
-    fn is_present(&mut self, path: &str) -> bool {
+    fn store_is_present(&mut self, path: &str) -> bool {
         let ptr = path.as_ptr();
         let res = unsafe { store_has(ptr, path.len()) };
         match res {
@@ -122,7 +122,7 @@ impl Runtime for KernelRuntime {
         }
     }
 
-    fn delete(&mut self, path: &str) -> Result<(), ()> {
+    fn store_delete(&mut self, path: &str) -> Result<(), ()> {
         let ptr = path.as_ptr();
         let res = unsafe { store_delete(ptr, path.len()) };
         match res {
@@ -131,8 +131,8 @@ impl Runtime for KernelRuntime {
         }
     }
 
-    fn read(&mut self, path: &str) -> Option<Vec<u8>> {
-        if !self.is_present(path) {
+    fn store_read(&mut self, path: &str) -> Option<Vec<u8>> {
+        if !self.store_is_present(path) {
             return None;
         }
 
@@ -159,7 +159,7 @@ impl Runtime for KernelRuntime {
         Some(buffer)
     }
 
-    fn write(&mut self, path: &str, data: &Vec<u8>) -> Result<(), ()> {
+    fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()> {
         let ptr = path.as_ptr();
         let data = data.clone();
         let length = data.len();
@@ -186,6 +186,9 @@ impl Runtime for KernelRuntime {
             );
             (res1, res2)
         };
+
+        self.write_debug(&format!("size: {}\n", length_res));
+        self.write_debug(&format!("data: {}\n", data_res));
 
         match (length_res, data_res) {
             (0, 0) => Ok(()),
