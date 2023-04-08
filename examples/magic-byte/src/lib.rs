@@ -9,6 +9,9 @@ pub fn transition<L: Logger>(logger: &mut L, _: External<String>) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<Application: App>(app: &mut Application) {
-    app.wrap(MagicByte::new(0x42)).register(transition).run();
+pub fn main<Application: App>(application: &mut Application) {
+    application
+        .wrap(MagicByte::new(0x42))
+        .register(transition)
+        .run();
 }

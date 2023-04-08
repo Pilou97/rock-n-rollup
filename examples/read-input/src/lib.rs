@@ -36,8 +36,9 @@ pub fn end_of_level_transition<L: Logger>(logger: &mut L, _: Internal<EndOfLevel
 }
 
 #[rock_n_rollup::main]
-pub fn main<Application: App>(app: &mut Application) {
-    app.register(transition)
+pub fn main<Application: App>(application: &mut Application) {
+    application
+        .register(transition)
         .register(string_transition)
         .register(start_of_level_transition)
         .register(info_per_level_transition)
