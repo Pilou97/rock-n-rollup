@@ -57,6 +57,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "store"
+version = "0.1.0"
+dependencies = [
+ "rock-n-rollup",
+]
+
+[[package]]
 name = "syn"
 version = "2.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
