@@ -17,7 +17,7 @@ pub trait IntoTransition<R, T>
 where
     R: Runtime,
 {
-    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)>;
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input) -> Result<(), ()>>;
 }
 
 impl<F, R> IntoTransition<R, ()> for F
@@ -25,8 +25,11 @@ where
     R: Runtime,
     F: Fn(&mut R) + 'static,
 {
-    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)> {
-        Box::new(move |runtime, _: Input| (self)(runtime))
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input) -> Result<(), ()>> {
+        Box::new(move |runtime, _: Input| {
+            (self)(runtime);
+            Ok(())
+        })
     }
 }
 
@@ -36,12 +39,15 @@ where
     F: Fn(&mut R, T) + 'static,
     T: FromInput,
 {
-    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)> {
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input) -> Result<(), ()>> {
         Box::new(move |runtime, input: Input| {
             let arg1 = T::from_input(runtime, input);
             match arg1 {
-                Ok(arg1) => (self)(runtime, arg1),
-                _ => (),
+                Ok(arg1) => {
+                    (self)(runtime, arg1);
+                    Ok(())
+                }
+                Err(_) => Err(()),
             }
         })
     }
@@ -55,13 +61,16 @@ where
     T1: FromInput,
     T2: FromInput,
 {
-    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input)> {
+    fn into_transition(self) -> Box<dyn FnMut(&mut R, Input) -> Result<(), ()>> {
         Box::new(move |runtime, input| {
             let arg1 = T1::from_input(runtime, input.clone());
             let arg2 = T2::from_input(runtime, input);
             match (arg1, arg2) {
-                (Ok(arg1), Ok(arg2)) => (self)(runtime, arg1, arg2),
-                _ => (),
+                (Ok(arg1), Ok(arg2)) => {
+                    (self)(runtime, arg1, arg2);
+                    Ok(())
+                }
+                _ => Err(()),
             }
         })
     }
@@ -84,7 +93,7 @@ where
     R: Runtime,
 {
     runtime: &'a mut R,
-    transitions: Vec<Box<dyn FnMut(&mut R, Input)>>,
+    transitions: Vec<Box<dyn FnMut(&mut R, Input) -> Result<(), ()>>>,
     middleware: Vec<Box<dyn Middleware>>,
 }
 
@@ -120,10 +129,14 @@ impl<'a, R: Runtime + 'static> App for Application<'a, R> {
                     match input {
                         Err(_) => {}
                         Ok(input) => {
-                            let _ = self
-                                .transitions
-                                .iter_mut()
-                                .for_each(|transition| transition(self.runtime, input.clone()));
+                            for transition in self.transitions.iter_mut() {
+                                match transition(self.runtime, input.clone()) {
+                                    Ok(_) => {
+                                        break;
+                                    }
+                                    Err(_) => {}
+                                }
+                            }
                         }
                     }
                 }
