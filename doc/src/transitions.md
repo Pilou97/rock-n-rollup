@@ -1,0 +1,51 @@
+# Writing Transitions
+
+`rock-n-rollup` uses the same semantic as major libraries of the Rust ecosystem. You can register transitions to the application (as handler for actix, or system for bevy, or route for axum, etc...).
+
+This transition can take any parameters that implement the trait `FromInput`.
+
+Let's see what types are already provided by the `rock-n-rollup` library.
+
+## Start of level, Info per level, End of level
+
+Smart rollups always inject 3 messages in the inbox:
+
+- `StartOfLevel` that indicates the beginning of the inbox.
+- `InfoPerLevel` that gives you the current tezos level of this execution.
+- `EndOfLevel` that indicates the end of the inbox.
+
+An easy way to execute a transition of this kind of message, is to add a parameter to your transition function:
+
+```rust
+fn start_of_level<R: Runtime>(rt: &mut R, msg: Internal<StartOfLevel>) {
+    // Only executed on StartOfLevel message
+    // ...
+}
+
+fn info_per_level<R: Runtime>(rt: &mut R, msg: Internal<InfoPerLevel>) {
+    // Only executed on InfoPerLevel message
+    // ...
+}
+
+fn end_of_level<R: Runtime>(rt: &mut R, msg: Internal<EndOfLevel>) {
+    // Only executed on EndOfLevel
+    // ...
+}
+```
+
+## External message
+
+Message from users can come from the `add_rollup_message` tezos operation, the message will be added to the inbox as an external message.
+
+If you want to trigger a transition on a `External` message, you just have to add a parameter to your transition function:
+
+```rust
+fn transition<R: Runtime>(rt: &mut R, msg: External<Vec<u8>>) {
+    // Only executed on external messages where the payload can be parsed as bytes
+    // External<Vec<u8>> will match on any messages
+    // ...
+}
+```
+
+At this point, you get all the features as the already provided kernel library provided by Tezos code dev.
+You can define transitions on any messages
