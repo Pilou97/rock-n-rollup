@@ -7,5 +7,5 @@ members = [
     "examples/read-input",
     "examples/magic-byte",
     "examples/store",
-    "examples/database-example"
+    "examples/database-example",
 ]
