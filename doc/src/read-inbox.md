@@ -1,12 +1,4 @@
-# Writing Transitions
-
-`rock-n-rollup` uses the same semantic as major libraries of the Rust ecosystem. You can register transitions to the application (as handler for actix, or system for bevy, or route for axum, etc...).
-
-This transition can take any parameters that implement the trait `FromInput`.
-
-Let's see what types are already provided by the `rock-n-rollup` library.
-
-## Start of level, Info per level, End of level
+# Start of level, Info per level, End of level
 
 Smart rollups always inject 3 messages in the inbox:
 
@@ -33,7 +25,7 @@ fn end_of_level<R: Runtime>(rt: &mut R, msg: Internal<EndOfLevel>) {
 }
 ```
 
-## External message
+# External message
 
 Message from users can come from the `add_rollup_message` tezos operation, the message will be added to the inbox as an external message.
 

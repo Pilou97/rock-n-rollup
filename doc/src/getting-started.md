@@ -40,7 +40,7 @@ Further append the following `entry` function to `src/lib.rs`:
 
 ```rust
 #[rock-n-rollup::main]
-fn entry<A: Application>(application: &mut App) {
+pub fn main<R: Runtime>(application: &mut Application<R>) {
     application
         .register(hello)
         .run();
