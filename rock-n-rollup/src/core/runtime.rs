@@ -181,9 +181,6 @@ impl Runtime for KernelRuntime {
             (res1, res2)
         };
 
-        self.write_debug(&format!("size: {}\n", length_res));
-        self.write_debug(&format!("data: {}\n", data_res));
-
         match (length_res, data_res) {
             (0, 0) => Ok(()),
             _ => Err(()),
