@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-all = ["external", "internal", "logger", "magic-byte", "database"]
+all = ["external", "internal", "logger"]
 external = []
 internal = []
 logger = []

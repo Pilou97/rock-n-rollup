@@ -1,11 +1,10 @@
 mod application;
-mod middleware;
 mod runtime;
+mod service;
 
-pub use application::App;
 pub use application::Application;
-pub use application::FromInput;
-pub use middleware::Middleware;
-pub use runtime::Input;
 pub use runtime::KernelRuntime;
+pub use runtime::RawInput;
 pub use runtime::Runtime;
+pub use service::FromInput;
+pub use service::Input;

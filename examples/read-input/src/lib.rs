@@ -1,5 +1,5 @@
 use rock_n_rollup::{
-    core::{App, Input},
+    core::{Application, Input, Runtime},
     plugins::{
         external::External,
         internal::{EndOfLevel, InfoPerLevel, Internal, StartOfLevel},
@@ -8,7 +8,7 @@ use rock_n_rollup::{
 };
 
 /// This function will be call each time
-pub fn transition<L: Logger>(logger: &mut L, input: Input) {
+pub fn transition<L: Logger>(logger: &mut L, input: Input<Vec<u8>>) {
     let Input { level, id, .. } = input;
     let msg = format!("The input is at level {} at index {}", level, id);
     logger.info(&msg);
@@ -36,7 +36,7 @@ pub fn end_of_level_transition<L: Logger>(logger: &mut L, _: Internal<EndOfLevel
 }
 
 #[rock_n_rollup::main]
-pub fn main<Application: App>(application: &mut Application) {
+pub fn main<R: Runtime>(application: &mut Application<R>) {
     application
         .register(transition)
         .register(string_transition)

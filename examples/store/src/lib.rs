@@ -1,5 +1,5 @@
 use rock_n_rollup::{
-    core::{App, Runtime},
+    core::{Application, Runtime},
     plugins::{external::External, logger::Logger},
 };
 
@@ -28,6 +28,6 @@ pub fn transition<R: Runtime + Logger>(rt: &mut R, _: External<String>) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<Application: App>(application: &mut Application) {
+pub fn main<R: Runtime>(application: &mut Application<R>) {
     application.register(transition).run();
 }

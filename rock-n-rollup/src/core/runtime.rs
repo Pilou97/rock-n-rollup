@@ -1,7 +1,7 @@
 pub const MAX_MESSAGE_SIZE: usize = 4096;
 
 #[derive(Clone)]
-pub struct Input {
+pub struct RawInput {
     pub level: u32,
     pub id: u32,
     pub payload: Vec<u8>,
@@ -55,12 +55,12 @@ extern "C" {
 
 }
 
-pub trait Runtime {
+pub trait Runtime: 'static {
     /// Print a message in the rollup stdout (if activated)
     fn write_debug(&mut self, msg: &str);
 
     /// Read one input
-    fn next_input(&mut self) -> Option<Input>;
+    fn next_input(&mut self) -> Option<RawInput>;
 
     /// Returns true if something is present under the following path
     fn store_is_present(&mut self, path: &str) -> bool;
@@ -75,13 +75,8 @@ pub trait Runtime {
     fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()>;
 }
 
+#[derive(Default)]
 pub struct KernelRuntime {}
-
-impl KernelRuntime {
-    pub fn new() -> Self {
-        KernelRuntime {}
-    }
-}
 
 impl Runtime for KernelRuntime {
     fn write_debug(&mut self, msg: &str) {
@@ -90,7 +85,7 @@ impl Runtime for KernelRuntime {
         }
     }
 
-    fn next_input(&mut self) -> Option<Input> {
+    fn next_input(&mut self) -> Option<RawInput> {
         let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE as usize);
 
         // Placeholder values
@@ -102,7 +97,7 @@ impl Runtime for KernelRuntime {
             None
         } else {
             unsafe { payload.set_len(size as usize) };
-            Some(Input {
+            Some(RawInput {
                 level: message_info.level as u32,
                 id: message_info.id as u32,
                 payload,
@@ -161,7 +156,6 @@ impl Runtime for KernelRuntime {
 
     fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()> {
         let ptr = path.as_ptr();
-        let data = data.clone();
         let length = data.len();
 
         let mut length_bytes = length.to_be_bytes().to_vec();
@@ -194,5 +188,47 @@ impl Runtime for KernelRuntime {
             (0, 0) => Ok(()),
             _ => Err(()),
         }
+    }
+}
+
+pub struct MockRuntime {
+    inputs: Vec<Vec<u8>>,
+}
+
+impl Default for MockRuntime {
+    fn default() -> Self {
+        Self {
+            inputs: vec![vec![0x01, 0x02]],
+        }
+    }
+}
+
+impl Runtime for MockRuntime {
+    fn write_debug(&mut self, msg: &str) {
+        println!("{}", msg);
+    }
+
+    fn next_input(&mut self) -> Option<RawInput> {
+        self.inputs.pop().map(|input| RawInput {
+            level: 0,
+            id: 0,
+            payload: input,
+        })
+    }
+
+    fn store_is_present(&mut self, _path: &str) -> bool {
+        todo!()
+    }
+
+    fn store_delete(&mut self, _path: &str) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn store_read(&mut self, _path: &str) -> Option<Vec<u8>> {
+        todo!()
+    }
+
+    fn store_write(&mut self, _path: &str, _data: &[u8]) -> Result<(), ()> {
+        todo!()
     }
 }

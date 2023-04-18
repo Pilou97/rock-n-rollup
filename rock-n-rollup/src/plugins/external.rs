@@ -33,11 +33,11 @@ where
     }
 }
 
-impl<T> FromInput for External<T>
+impl<T> FromInput<Vec<u8>> for External<T>
 where
     T: FromExternal,
 {
-    fn from_input<R: Runtime>(_: &mut R, input: Input) -> Result<Self, ()> {
+    fn from_input<R: Runtime>(_: &mut R, input: &Input<Vec<u8>>) -> Result<Self, ()> {
         // First we need to make sure it starts by 0x01
         match input.payload[..] {
             [0x01, ..] => {
