@@ -59,3 +59,9 @@ impl FromExternal for String {
         String::from_utf8(input).map_err(|_| ())
     }
 }
+
+impl FromExternal for Vec<u8> {
+    fn from_external(input: Vec<u8>) -> Result<Self, ()> {
+        Ok(input)
+    }
+}
