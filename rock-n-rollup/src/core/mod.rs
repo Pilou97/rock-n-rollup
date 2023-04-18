@@ -4,6 +4,7 @@ mod service;
 
 pub use application::Application;
 pub use runtime::KernelRuntime;
+pub use runtime::MockRuntime;
 pub use runtime::RawInput;
 pub use runtime::Runtime;
 pub use service::FromInput;

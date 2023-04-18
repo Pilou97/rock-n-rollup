@@ -192,28 +192,47 @@ impl Runtime for KernelRuntime {
 }
 
 pub struct MockRuntime {
-    inputs: Vec<Vec<u8>>,
+    stdout: Vec<String>,
+    inputs: Vec<RawInput>,
 }
 
 impl Default for MockRuntime {
     fn default() -> Self {
         Self {
-            inputs: vec![vec![0x01, 0x02]],
+            stdout: Vec::default(),
+            inputs: Vec::default(),
         }
+    }
+}
+
+impl MockRuntime {
+    pub fn stdout(&self) -> Vec<&str> {
+        self.stdout
+            .iter()
+            .map(|str| str.as_str())
+            .collect::<Vec<&str>>()
+    }
+
+    pub fn add_input(&mut self, input: Vec<u8>) -> &mut Self {
+        let level = 0;
+        let id = self.inputs.len();
+        let msg = RawInput {
+            level,
+            id: u32::try_from(id).unwrap(),
+            payload: input,
+        };
+        self.inputs.push(msg);
+        self
     }
 }
 
 impl Runtime for MockRuntime {
     fn write_debug(&mut self, msg: &str) {
-        println!("{}", msg);
+        self.stdout.push(msg.to_string());
     }
 
     fn next_input(&mut self) -> Option<RawInput> {
-        self.inputs.pop().map(|input| RawInput {
-            level: 0,
-            id: 0,
-            payload: input,
-        })
+        self.inputs.pop()
     }
 
     fn store_is_present(&mut self, _path: &str) -> bool {

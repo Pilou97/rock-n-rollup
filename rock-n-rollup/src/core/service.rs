@@ -795,40 +795,40 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::core::{runtime::MockRuntime, service::Runnable, RawInput, Runtime};
+    use crate::core::{runtime::MockRuntime, Application, Runtime};
 
     use super::Service;
 
     fn transition_0<R: Runtime>(rt: &mut R) {
-        rt.write_debug("Hello world 1");
+        rt.write_debug("Hello world 0");
     }
 
     fn transition_1<R: Runtime>(rt: &mut R, _: ()) {
-        rt.write_debug("Hello world 2");
+        rt.write_debug("Hello world 1");
     }
 
     fn transition_2<R: Runtime>(rt: &mut R, _: (), _: ()) {
-        rt.write_debug("Hello world 3");
+        rt.write_debug("Hello world 2");
     }
 
     fn transition_3<R: Runtime>(rt: &mut R, _: (), _: (), _: ()) {
-        rt.write_debug("Hello world 4");
+        rt.write_debug("Hello world 3");
     }
 
     fn transition_4<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: ()) {
-        rt.write_debug("Hello world 5");
+        rt.write_debug("Hello world 4");
     }
 
     fn transition_5<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: (), _: ()) {
-        rt.write_debug("Hello world 6");
+        rt.write_debug("Hello world 5");
     }
 
     fn transition_6<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: (), _: (), _: ()) {
-        rt.write_debug("Hello world 7");
+        rt.write_debug("Hello world 6");
     }
 
     fn transition_7<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: (), _: (), _: (), _: ()) {
-        rt.write_debug("Hello world 8");
+        rt.write_debug("Hello world 7");
     }
 
     fn transition_8<R: Runtime>(
@@ -842,7 +842,7 @@ mod tests {
         _: (),
         _: (),
     ) {
-        rt.write_debug("Hello world 3");
+        rt.write_debug("Hello world 8");
     }
 
     fn transition_9<R: Runtime>(
@@ -857,22 +857,16 @@ mod tests {
         _: (),
         _: (),
     ) {
-        rt.write_debug("Hello world 3");
+        rt.write_debug("Hello world 9");
     }
 
     #[test]
     fn test() {
         let mut runtime = MockRuntime::default();
-        let input = RawInput {
-            level: 1,
-            id: 1,
-            payload: Vec::default(),
-        };
-
+        runtime.add_input(Vec::default());
         let mut service = Service::<MockRuntime, _>::default();
 
         service
-            .add_guard(|_runtime, _input| true)
             .add_guard(|_runtime, _input| true)
             .register(transition_0)
             .register(transition_1)
@@ -883,9 +877,24 @@ mod tests {
             .register(transition_6)
             .register(transition_7)
             .register(transition_8)
-            .register(transition_9)
-            .run(&mut runtime, input);
+            .register(transition_9);
 
-        assert!(false)
+        let () = Application::new(&mut runtime).service(service).run();
+
+        assert_eq!(
+            runtime.stdout(),
+            vec![
+                "Hello world 0",
+                "Hello world 1",
+                "Hello world 2",
+                "Hello world 3",
+                "Hello world 4",
+                "Hello world 5",
+                "Hello world 6",
+                "Hello world 7",
+                "Hello world 8",
+                "Hello world 9",
+            ]
+        )
     }
 }
