@@ -1,4 +1,4 @@
 pub mod core;
 pub mod plugins;
 
-pub use kernel_macro::main;
+pub use rock_n_rollup_macro::main;

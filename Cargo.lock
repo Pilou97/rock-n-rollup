@@ -19,14 +19,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kernel-macro"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -53,11 +45,19 @@ dependencies = [
 
 [[package]]
 name = "rock-n-rollup"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "bincode",
- "kernel-macro",
+ "rock-n-rollup-macro",
  "serde",
+]
+
+[[package]]
+name = "rock-n-rollup-macro"
+version = "0.0.1"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]
