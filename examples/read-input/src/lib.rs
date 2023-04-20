@@ -1,9 +1,9 @@
 use rock_n_rollup::{
     core::{Application, Input, Runtime},
-    plugins::{
+    plugins::logger::Logger,
+    services::{
         external::External,
         internal::{EndOfLevel, InfoPerLevel, Internal, StartOfLevel},
-        logger::Logger,
     },
 };
 

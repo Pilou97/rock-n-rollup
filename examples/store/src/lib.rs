@@ -1,6 +1,7 @@
 use rock_n_rollup::{
     core::{Application, Runtime},
-    plugins::{external::External, logger::Logger},
+    plugins::logger::Logger,
+    services::external::External,
 };
 
 /// This function will be call each time
