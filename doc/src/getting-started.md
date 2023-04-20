@@ -8,7 +8,7 @@ To develop Smart Rollups on tezos, you will also need to compile your Rust code 
 
 # Hello kernel!
 
-Start by creating a new library-based Cargo project and changing into the new directory:
+Start by creating a new library based Cargo project and changing into the new directory:
 
 ```bash
 cargo new hello-kernel --lib
