@@ -9,12 +9,13 @@ repository = "https://github.com/Pilou97/rock-n-rollup"
 keywords = ["tezos", "macro", "kernel", "smart-rollup", "rollup"]
 
 [features]
-all = ["external", "internal", "logger"]
+all = ["external", "internal", "logger", "hasher"]
 external = []
 internal = []
 logger = []
 magic-byte = []
 database = []
+hasher = []
 
 [lib]
 crate-type = ["rlib", "cdylib"]
@@ -23,3 +24,4 @@ crate-type = ["rlib", "cdylib"]
 rock-n-rollup-macro = {path="../kernel-macro", version="0.0.1"}
 bincode = "1.3.3"
 serde = "1.0.159"
+blake2 = "0.10.6"
