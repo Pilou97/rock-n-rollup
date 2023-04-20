@@ -6,3 +6,4 @@
   - [Read the Inbox](./read-inbox.md)
 - [Plugins](./plugins.md)
   - [Logger](./plugins/logger.md)
+  - [Hasher](./plugins/hasher.md)
