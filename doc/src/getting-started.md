@@ -11,15 +11,22 @@ To develop Smart Rollups on tezos, you will also need to compile your Rust code 
 Start by creating a new library-based Cargo project and changing into the new directory:
 
 ```bash
-cargo new hello-kernel
+cargo new hello-kernel --lib
 cd hello-kernel
+```
+
+Add a `lib` section to your Cargo.toml:
+
+```
+[lib]
+crate-type = ["rlib", "cdylib"]
 ```
 
 Add `rock-n-rollup` as a dependency of your project by adding the following to your `Cargo.toml` file.
 
 ```
 [dependencies]
-rock-n-rollup = "0.1"
+rock-n-rollup = "0.0.1"
 ```
 
 Transition functions accept zero or more parameters. These parameters can be extracted from an input (see `FromInput` trait) and returns void.
@@ -27,24 +34,21 @@ Transition functions accept zero or more parameters. These parameters can be ext
 Replace the contents of `src/lib.rs` with the following:
 
 ```rust
-use rock-n-rollup::*;
+use rock_n_rollup::core::{Application, Runtime};
 
-fn hello<L: Logger>(logger: &mut Logger) {
-    logger.info("Hello kernel!");
+
+fn hello<R: Runtime>(rt: &mut R) {
+    rt.write_debug("Hello kernel!");
 }
 ```
 
-Next, create an `entry` function, that accept an `App` as parameters. Use `App::register` to add a transition to your application. Finnaly the app is started by calling `run` on it.
-
-Further append the following `entry` function to `src/lib.rs`:
+Next, create a `main` function, that accept an `Application` as parameters. Use `App.register` to add a transition to your application. Finnaly the app is started by calling `run` on it.
 
 ```rust
-#[rock-n-rollup::main]
+#[rock_n_rollup::main]
 pub fn main<R: Runtime>(application: &mut Application<R>) {
-    application
-        .register(hello)
-        .run();
+    application.register(hello).run();
 }
 ```
 
-That's it! It should compile with `cargo build --target wasm32-unknown-unknown`
+That's it! It should compile with `cargo build --release --target wasm32-unknown-unknown`
