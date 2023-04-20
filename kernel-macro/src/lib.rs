@@ -21,10 +21,6 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
         #input_fn
     };
 
-    // Print the generated Rust code for debugging purposes
-    let output_string = output.to_string();
-    println!("{}", output_string);
-
     // Return the generated tokens
     output.into()
 }
