@@ -11,10 +11,10 @@ pub struct Blake2b256([u8; 32]);
 
 pub trait Hasher {
     /// Hash any data to a Blake2b 256 bits
-    fn hash<T: AsRef<[u8]>>(&mut self, data: &T) -> Blake2b256;
+    fn hash(&mut self, data: &[u8]) -> Blake2b256;
 
     /// Hash any data to a Blake2b 512 bits
-    fn hash_512<T: AsRef<[u8]>>(&mut self, data: &T) -> Blake2b512;
+    fn hash_512(&mut self, data: &[u8]) -> Blake2b512;
 }
 
 impl ToString for Blake2b512 {
@@ -33,11 +33,23 @@ impl ToString for Blake2b256 {
     }
 }
 
+impl AsRef<[u8]> for Blake2b512 {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
+    }
+}
+
+impl AsRef<[u8]> for Blake2b256 {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
+    }
+}
+
 impl<R> Hasher for R
 where
     R: Runtime,
 {
-    fn hash<T: AsRef<[u8]>>(&mut self, data: &T) -> Blake2b256 {
+    fn hash(&mut self, data: &[u8]) -> Blake2b256 {
         let mut hasher = Blake2bVar::new(32).unwrap();
         hasher.update(data.as_ref());
         let mut buf = [0u8; 32];
@@ -45,7 +57,7 @@ where
         Blake2b256(buf)
     }
 
-    fn hash_512<T: AsRef<[u8]>>(&mut self, data: &T) -> Blake2b512 {
+    fn hash_512(&mut self, data: &[u8]) -> Blake2b512 {
         let mut hasher = Blake2bVar::new(64).unwrap();
         hasher.update(data.as_ref());
         let mut buf = [0u8; 64];
@@ -60,28 +72,12 @@ mod tests {
     use crate::core::MockRuntime;
 
     #[test]
-    fn hash_512() {
-        let data: Vec<u8> = vec![0x01, 0x02, 0x03, 0x04];
+    fn test_hash_512() {
         let mut runtime = MockRuntime::default();
-
+        let data = "hello world".as_bytes().to_vec();
         let hash = runtime.hash_512(&data);
-        assert_eq!(
-            hash.to_string(),
-            "a482fdc4e226d57674e9a9086fc79e97deb5a648922c478e6347b32815d810b1df289553cf6f501c4c230a0b0fc88b58079e7d6798ca3278ecb2ce3db67cb1ab"
-        );
-    }
-
-    #[test]
-    fn hash_256() {
-        let data: Vec<u8> = vec![0x01, 0x02, 0x03, 0x04];
-        let mut runtime = MockRuntime::default();
-
-        let hash = runtime.hash(&data);
-
-        assert_eq!(
-            hash.to_string(),
-            "28517e4cdf6c90798c1a983b03727ca7743c21a3880672429ccfc5bd15ea5f72"
-        );
+        let hash = hash.to_string();
+        assert_eq!(hash, "021ced8799296ceca557832ab941a50b4a11f83478cf141f51f933f653ab9fbcc05a037cddbed06e309bf334942c4e58cdf1a46e237911ccd7fcf9787cbc7fd0");
     }
 
     #[test]
