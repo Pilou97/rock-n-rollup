@@ -687,6 +687,12 @@ where
 }
 
 ///// FromInput implementation
+pub trait FromRawInput
+where
+    Self: Sized,
+{
+    fn from_raw_input<R: Runtime>(runtime: &mut R, input: &RawInput) -> Result<Self, ()>;
+}
 
 impl FromInput<Vec<u8>> for () {
     fn from_input<R: Runtime>(_: &mut R, _: &Input<Vec<u8>>) -> Result<Self, ()> {
@@ -703,9 +709,27 @@ where
     }
 }
 
+impl<P> FromInput<P> for P
+where
+    P: Clone,
+{
+    fn from_input<R: Runtime>(_: &mut R, input: &Input<P>) -> Result<Self, ()> {
+        Ok(input.payload.clone())
+    }
+}
+
+impl FromRawInput for Vec<u8> {
+    fn from_raw_input<R: Runtime>(_: &mut R, input: &RawInput) -> Result<Self, ()> {
+        Ok(input.payload.clone())
+    }
+}
+
 ////// Service
 
-pub struct Service<R, P> {
+pub struct Service<R, P>
+where
+    P: FromRawInput,
+{
     guards: Vec<Box<GuardFct<R, P>>>,
     transitions: Vec<Box<TransitionFct<R, P>>>,
 }
@@ -713,6 +737,7 @@ pub struct Service<R, P> {
 impl<R, P> Default for Service<R, P>
 where
     R: Runtime,
+    P: FromRawInput,
 {
     fn default() -> Self {
         Self {
@@ -732,10 +757,10 @@ where
 impl<R, P> Runnable<R> for Service<R, P>
 where
     R: Runtime,
-    P: TryFrom<Vec<u8>>,
+    P: FromRawInput,
 {
     fn run(&mut self, runtime: &mut R, input: RawInput) {
-        let payload = match P::try_from(input.payload) {
+        let payload = match P::from_raw_input(runtime, &input) {
             Ok(payload) => payload,
             Err(_) => todo!("handle this error"),
         };
@@ -767,7 +792,7 @@ where
 impl<R, P> Service<R, P>
 where
     R: Runtime + 'static,
-    P: TryFrom<Vec<u8>> + Clone + 'static,
+    P: FromRawInput + 'static,
 {
     /// Add a guard to the service
     ///
@@ -864,7 +889,7 @@ mod tests {
     fn test() {
         let mut runtime = MockRuntime::default();
         runtime.add_input(Vec::default());
-        let mut service = Service::<MockRuntime, _>::default();
+        let mut service = Service::<MockRuntime, Vec<u8>>::default();
 
         service
             .add_guard(|_runtime, _input| true)
