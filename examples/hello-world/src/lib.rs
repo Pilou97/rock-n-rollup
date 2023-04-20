@@ -4,7 +4,7 @@ use rock_n_rollup::{
 };
 
 pub fn hello<L: Logger>(logger: &mut L) {
-    logger.info("Hello world");
+    logger.log("Hello world");
 }
 
 #[rock_n_rollup::main]
