@@ -4,3 +4,4 @@
 - [Basics](./basics.md)
   - [Getting start](./getting-started.md)
   - [Read the Inbox](./read-inbox.md)
+- [Plugins](./plugins.md)
