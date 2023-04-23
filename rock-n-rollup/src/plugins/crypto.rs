@@ -49,8 +49,8 @@ pub trait Verifier {
     /// Then the public will be used to verify that the signature is indeed the signature of the generated hash
     fn verify_signature(
         &mut self,
-        signature: Signature,
-        public_key: PublicKey,
+        signature: &Signature,
+        public_key: &PublicKey,
         data: &[u8],
     ) -> bool;
 }
@@ -61,8 +61,8 @@ where
 {
     fn verify_signature(
         &mut self,
-        signature: Signature,
-        public_key: PublicKey,
+        signature: &Signature,
+        public_key: &PublicKey,
         data: &[u8],
     ) -> bool {
         let data = self.hash(data);
@@ -110,9 +110,8 @@ mod tests {
 
         //// Check the signature
         let data = "hello world".as_bytes();
-        let data = data.to_vec();
 
-        let is_ok = rt.verify_signature(signature, public_key, &data);
+        let is_ok = rt.verify_signature(&signature, &public_key, data);
 
         assert!(is_ok);
     }
