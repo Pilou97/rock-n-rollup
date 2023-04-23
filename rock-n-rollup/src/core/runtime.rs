@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub const MAX_MESSAGE_SIZE: usize = 4096;
 
 #[derive(Clone)]
@@ -191,6 +193,7 @@ impl Runtime for KernelRuntime {
 pub struct MockRuntime {
     stdout: Vec<String>,
     inputs: Vec<RawInput>,
+    storage: HashMap<String, Vec<u8>>,
 }
 
 impl Default for MockRuntime {
@@ -198,6 +201,7 @@ impl Default for MockRuntime {
         Self {
             stdout: Vec::default(),
             inputs: Vec::default(),
+            storage: HashMap::default(),
         }
     }
 }
@@ -240,11 +244,12 @@ impl Runtime for MockRuntime {
         todo!()
     }
 
-    fn store_read(&mut self, _path: &str) -> Option<Vec<u8>> {
-        todo!()
+    fn store_read(&mut self, path: &str) -> Option<Vec<u8>> {
+        self.storage.get(path).cloned()
     }
 
-    fn store_write(&mut self, _path: &str, _data: &[u8]) -> Result<(), ()> {
-        todo!()
+    fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()> {
+        self.storage.insert(path.to_string(), data.to_vec());
+        Ok(())
     }
 }
