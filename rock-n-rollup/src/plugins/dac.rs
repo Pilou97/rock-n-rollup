@@ -1,5 +1,40 @@
 use crate::core::{Runtime, PREIMAGE_HASH_SIZE};
 
+pub struct PreimageHash {
+    inner: [u8; PREIMAGE_HASH_SIZE],
+}
+
+impl TryFrom<&str> for PreimageHash {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let decoded = hex::decode(value).map_err(|_| ())?;
+        let inner = decoded.try_into().map_err(|_| ())?;
+        Ok(Self { inner })
+    }
+}
+
+impl AsRef<[u8; PREIMAGE_HASH_SIZE]> for PreimageHash {
+    fn as_ref(&self) -> &[u8; PREIMAGE_HASH_SIZE] {
+        &self.inner
+    }
+}
+
+impl<'a> TryFrom<&'a [u8]> for PreimageHash {
+    type Error = ();
+
+    fn try_from(value: &'a [u8]) -> Result<Self, Self::Error> {
+        let inner = value.try_into().map_err(|_| ())?;
+        Ok(Self { inner })
+    }
+}
+
+impl PreimageHash {
+    fn new(inner: [u8; PREIMAGE_HASH_SIZE]) -> Self {
+        Self { inner }
+    }
+}
+
 /// Borrowing version of [V0ContentPage].
 #[derive(Debug)]
 pub struct V0SliceContentPage<'a> {
@@ -124,7 +159,7 @@ impl<'a> TryFrom<&'a [u8]> for SlicePage<'a> {
 pub fn reveal_loop<Host: Runtime>(
     host: &mut Host,
     level: usize,
-    hash: &[u8; 33],
+    hash: &PreimageHash,
     max_dac_levels: usize,
     acc: &mut Vec<Vec<u8>>,
 ) -> Result<(), ()> {
@@ -132,7 +167,7 @@ pub fn reveal_loop<Host: Runtime>(
         return Err(());
     }
 
-    let page = host.reveal_preimage(hash)?;
+    let page = host.reveal_preimage(hash.as_ref())?;
     let page = page.as_ref();
 
     let page = SlicePage::try_from(page).map_err(|_| ())?;
@@ -140,7 +175,8 @@ pub fn reveal_loop<Host: Runtime>(
     match page {
         SlicePage::V0HashPage(hashes) => {
             for hash in hashes.hashes() {
-                reveal_loop(host, level + 1, hash, max_dac_levels, acc)?;
+                let hash = PreimageHash::new(hash.clone()); // TODO: avoid cloning
+                reveal_loop(host, level + 1, &hash, max_dac_levels, acc)?;
             }
             Ok(())
         }
@@ -154,14 +190,14 @@ pub fn reveal_loop<Host: Runtime>(
 
 pub trait Dac {
     /// Read the data from the DAC and returns you the data as a vector of bytes
-    fn read_from_dac(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()>;
+    fn read_from_dac(&mut self, hash: &PreimageHash) -> Result<Vec<u8>, ()>;
 }
 
 impl<R> Dac for R
 where
     R: Runtime,
 {
-    fn read_from_dac(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
+    fn read_from_dac(&mut self, hash: &PreimageHash) -> Result<Vec<u8>, ()> {
         let mut data = Vec::default();
         let () = reveal_loop(self, 0, hash, 3, &mut data)?;
         let data = data.iter().flatten().copied().collect::<Vec<u8>>();
