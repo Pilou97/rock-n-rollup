@@ -8,3 +8,4 @@
   - [Logger](./plugins/logger.md)
   - [Hasher](./plugins/hasher.md)
   - [Crypto](./plugins/crypto.md)
+  - [Database](./plugins/database.md)
