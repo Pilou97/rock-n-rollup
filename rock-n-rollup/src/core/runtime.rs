@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use super::constants::PREIMAGE_HASH_SIZE;
+
 pub const MAX_MESSAGE_SIZE: usize = 4096;
 
 #[derive(Clone)]
@@ -55,6 +57,13 @@ extern "C" {
         num_bytes: usize,
     ) -> i32;
 
+    /// Returns the number of bytes written at `dst`, or an error code.
+    pub fn reveal_preimage(
+        hash_addr: *const u8,
+        hash_size: u8,
+        dst: *mut u8,
+        max_bytes: usize,
+    ) -> i32;
 }
 
 pub trait Runtime: 'static {
@@ -75,6 +84,9 @@ pub trait Runtime: 'static {
 
     /// Write some data at a given path
     fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()>;
+
+    /// Reveal date from the reveal data directory
+    fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()>;
 }
 
 #[derive(Default)]
@@ -188,6 +200,24 @@ impl Runtime for KernelRuntime {
             _ => Err(()),
         }
     }
+
+    fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
+        let max_size = 4096;
+        let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE as usize);
+
+        let u8_size = u8::try_from(PREIMAGE_HASH_SIZE).unwrap();
+
+        unsafe {
+            let size = reveal_preimage(hash.as_ptr(), u8_size, payload.as_mut_ptr(), max_size);
+            if size < 0 {
+                Err(())
+            } else {
+                let size = usize::try_from(size).unwrap();
+                payload.set_len(size);
+                Ok(payload)
+            }
+        }
+    }
 }
 
 pub struct MockRuntime {
@@ -251,5 +281,9 @@ impl Runtime for MockRuntime {
     fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()> {
         self.storage.insert(path.to_string(), data.to_vec());
         Ok(())
+    }
+
+    fn reveal_preimage(&mut self, _hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
+        todo!()
     }
 }

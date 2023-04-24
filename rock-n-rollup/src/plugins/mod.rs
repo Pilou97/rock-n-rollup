@@ -5,3 +5,5 @@ pub mod logger;
 pub mod crypto;
 
 pub mod database;
+
+pub mod dac;

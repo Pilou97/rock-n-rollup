@@ -6,4 +6,5 @@ members = [
     "examples/hello-world",
     "examples/read-input",
     "examples/store",
+    "examples/preimage",
 ]
