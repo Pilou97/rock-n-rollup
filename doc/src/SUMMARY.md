@@ -9,3 +9,4 @@
   - [Hasher](./plugins/hasher.md)
   - [Crypto](./plugins/crypto.md)
   - [Database](./plugins/database.md)
+  - [Dac](./plugins/dac.md)
