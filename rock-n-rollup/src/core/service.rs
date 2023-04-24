@@ -34,6 +34,7 @@ where
     F: Fn(&mut R) + 'static,
 {
     fn into_transition(self) -> Box<dyn FnMut(&mut R, &Input<P>, &S) -> Result<(), ()>> {
+        println!("Into transition");
         Box::new(move |runtime: &mut R, _: &Input<P>, _: &S| {
             (self)(runtime);
             Ok(())
@@ -726,6 +727,12 @@ impl FromRawInput for Vec<u8> {
     }
 }
 
+impl FromRawInput for () {
+    fn from_raw_input<R: Runtime>(_: &mut R, _: &RawInput) -> Result<Self, ()> {
+        Ok(())
+    }
+}
+
 ////// Service
 
 pub struct Service<R, P, S>
@@ -763,10 +770,13 @@ where
     P: FromRawInput,
 {
     fn run(&mut self, runtime: &mut R, input: RawInput) {
+        println!("run");
+
         let payload = match P::from_raw_input(runtime, &input) {
             Ok(payload) => payload,
             Err(_) => todo!("handle this error"),
         };
+        println!("payload is present");
 
         // Get the raw input
         let input = Input {
@@ -783,11 +793,16 @@ where
 
         match accepted {
             false => {
+                println!("hmmmm");
                 // Do nothing on this message
             }
             true => {
+                println!("it's accepted");
                 // Now we can execute every transitions
+                println!("transitions: {}", self.transitions.len());
+
                 for transition in self.transitions.iter_mut() {
+                    println!("transition");
                     let _ = transition(runtime, &input, &state);
                 }
             }
@@ -819,6 +834,8 @@ where
         F: IntoTransition<R, P, S, Marker> + 'static,
     {
         let fct = transition.into_transition();
+        println!("register");
+        println!("registered: {}", self.transitions.len());
         self.transitions.push(fct);
         self
     }
@@ -847,14 +864,30 @@ where
 mod tests {
     use crate::core::{runtime::MockRuntime, Application, Runtime};
 
-    use super::Service;
+    use super::{FromInput, IntoService, Service};
+
+    struct Test {
+        inner: String,
+    }
+
+    impl FromInput<Vec<u8>, String> for Test {
+        fn from_input<R: Runtime>(
+            _: &mut R,
+            _: &super::Input<Vec<u8>>,
+            state: &String,
+        ) -> Result<Self, ()> {
+            Ok(Self {
+                inner: state.clone(),
+            })
+        }
+    }
 
     fn transition_0<R: Runtime>(rt: &mut R) {
         rt.write_debug("Hello world 0");
     }
 
-    fn transition_1<R: Runtime>(rt: &mut R, _: ()) {
-        rt.write_debug("Hello world 1");
+    fn transition_1<R: Runtime>(rt: &mut R, t: Test) {
+        rt.write_debug(&t.inner);
     }
 
     fn transition_2<R: Runtime>(rt: &mut R, _: (), _: ()) {
@@ -914,7 +947,7 @@ mod tests {
     fn test() {
         let mut runtime = MockRuntime::default();
         runtime.add_input(Vec::default());
-        let mut service = Service::<MockRuntime, Vec<u8>, ()>::new(());
+        let mut service = Service::<_, Vec<u8>, String>::new("Hello world 1".to_string());
 
         service
             .add_guard(|_runtime, _input| true)
@@ -929,9 +962,7 @@ mod tests {
             .register(transition_8)
             .register(transition_9);
 
-        let () = Application::new(&mut runtime)
-            .service::<Vec<u8>>(service)
-            .run();
+        let () = Application::new(&mut runtime).service(service).run();
 
         assert_eq!(
             runtime.stdout(),
@@ -959,10 +990,11 @@ mod tests {
         let mut runtime = MockRuntime::default();
         let mut application = Application::new(&mut runtime);
 
-        let service = CustomService {
+        let service: Service<_, (), CustomService> = CustomService {
             _data: "some data".to_string(),
-        };
+        }
+        .into_service();
 
-        application.service::<Vec<u8>>(service).run();
+        application.service(service).run();
     }
 }
