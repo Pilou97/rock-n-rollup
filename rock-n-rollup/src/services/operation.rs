@@ -131,13 +131,14 @@ where
     pub payload: P,
 }
 
-impl<P> FromInput<RawExternalOperation> for Json<P>
+impl<P, S> FromInput<RawExternalOperation, S> for Json<P>
 where
     P: DeserializeOwned,
 {
     fn from_input<R: crate::core::Runtime>(
         _: &mut R,
         input: &crate::core::Input<RawExternalOperation>,
+        _: &S,
     ) -> Result<Self, ()> {
         // TODO: find a better serialization protocol;
         let bytes = (&input.payload.payload).clone();
@@ -172,7 +173,7 @@ mod tests {
 
     #[test]
     fn test() {
-        let mut service = Service::<MockRuntime, RawExternalOperation>::default();
+        let mut service = Service::<MockRuntime, RawExternalOperation, ()>::new(());
         service.register(transition).register(transition_2);
     }
 

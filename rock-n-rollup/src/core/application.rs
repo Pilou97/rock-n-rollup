@@ -1,6 +1,6 @@
 use super::{
-    service::{Input, IntoTransition, Runnable, Service},
-    Runtime,
+    service::{Input, IntoService, IntoTransition, Runnable, Service},
+    FromRawInput, Runtime,
 };
 
 pub struct Application<'a, R>
@@ -9,13 +9,13 @@ where
 {
     runtime: &'a mut R,
     services: Vec<Box<dyn Runnable<R>>>,
-    base: Service<R, Vec<u8>>,
+    base: Service<R, Vec<u8>, ()>,
 }
 
 impl<'a, R: Runtime + 'static> Application<'a, R> {
     pub fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
-        F: IntoTransition<R, Vec<u8>, Marker> + 'static,
+        F: IntoTransition<R, Vec<u8>, (), Marker> + 'static,
     {
         self.base.register(transition);
         self
@@ -26,7 +26,12 @@ impl<'a, R: Runtime + 'static> Application<'a, R> {
         self
     }
 
-    pub fn service(&mut self, service: impl Runnable<R> + 'static) -> &mut Self {
+    pub fn service<P>(&mut self, service: impl IntoService<R, P> + 'static) -> &mut Self
+    where
+        P: FromRawInput + 'static,
+    {
+        let service = service.into_service();
+
         let boxed = Box::new(service);
         self.services.push(boxed);
         self
@@ -58,7 +63,7 @@ where
         Self {
             runtime,
             services: Vec::default(),
-            base: Service::<R, Vec<u8>>::default(),
+            base: Service::<R, Vec<u8>, ()>::new(()),
         }
     }
 }

@@ -61,8 +61,8 @@ impl FromInternal for EndOfLevel {
     }
 }
 
-impl<T: FromInternal> FromInput<Vec<u8>> for Internal<T> {
-    fn from_input<R: Runtime>(_: &mut R, input: &Input<Vec<u8>>) -> Result<Self, ()> {
+impl<T: FromInternal, S> FromInput<Vec<u8>, S> for Internal<T> {
+    fn from_input<R: Runtime>(_: &mut R, input: &Input<Vec<u8>>, _: &S) -> Result<Self, ()> {
         let payload = T::from_internal(&input.payload)?;
         Ok(Internal {
             level: input.level,
