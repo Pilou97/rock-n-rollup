@@ -3,6 +3,10 @@ mod constants;
 mod runtime;
 mod service;
 
+pub mod michelson {
+    pub use tezos_smart_rollup_encoding::michelson::*;
+}
+
 pub use application::Application;
 pub use constants::PREIMAGE_HASH_SIZE;
 pub use runtime::KernelRuntime;

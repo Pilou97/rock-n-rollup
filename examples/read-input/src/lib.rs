@@ -1,9 +1,12 @@
 use rock_n_rollup::{
-    core::{Application, Input, Runtime},
+    core::{
+        michelson::{ticket::Ticket, MichelsonBytes},
+        Application, Input, Runtime,
+    },
     plugins::logger::Logger,
     services::{
         external::External,
-        internal::{EndOfLevel, InfoPerLevel, Internal, StartOfLevel},
+        internal::{EndOfLevel, InfoPerLevel, Internal, StartOfLevel, Transfer},
     },
 };
 
@@ -35,13 +38,30 @@ pub fn end_of_level_transition<L: Logger>(logger: &mut L, _: Internal<EndOfLevel
     logger.info("End of level");
 }
 
+pub fn ticket_transition<L: Logger>(
+    logger: &mut L,
+    ticket: Internal<Transfer<Ticket<MichelsonBytes>>>,
+) {
+    logger.info("A ticket just appeared");
+    let transfer = ticket.payload();
+    let destination = transfer.destination();
+    let _ticket = transfer.payload();
+    let source = transfer.source();
+    let sender = transfer.sender();
+
+    logger.info(destination);
+    logger.info(sender);
+    logger.info(source);
+}
+
 #[rock_n_rollup::main]
 pub fn main<R: Runtime>(application: &mut Application<R>) {
     application
-        .register(transition)
-        .register(string_transition)
-        .register(start_of_level_transition)
-        .register(info_per_level_transition)
-        .register(end_of_level_transition)
+        // .register(transition)
+        // .register(string_transition)
+        // .register(start_of_level_transition)
+        // .register(info_per_level_transition)
+        // .register(end_of_level_transition)
+        .register(ticket_transition)
         .run();
 }
