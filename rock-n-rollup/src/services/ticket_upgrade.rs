@@ -1,4 +1,3 @@
-use super::internal::{Internal, Transfer};
 use crate::{
     core::{FromInput, Input, IntoService, Runtime, Service},
     plugins::{
@@ -8,6 +7,8 @@ use crate::{
     },
 };
 use tezos_smart_rollup_encoding::michelson::{ticket::Ticket, MichelsonBytes};
+
+use super::internal::{Internal, Transfer};
 
 #[derive(Clone)]
 pub struct TicketUpgrade {

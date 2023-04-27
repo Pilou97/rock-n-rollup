@@ -10,15 +10,6 @@ keywords = ["tezos", "macro", "kernel", "smart-rollup", "rollup"]
 homepage = "https://pilou97.github.io/rock-n-rollup/"
 readme = "readme.md"
 
-[features]
-all = ["external", "internal", "logger", "hasher"]
-external = []
-internal = []
-logger = []
-magic-byte = []
-database = []
-hasher = []
-
 [lib]
 crate-type = ["rlib", "cdylib"]
 
