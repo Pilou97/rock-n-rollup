@@ -7,4 +7,5 @@ members = [
     "examples/read-input",
     "examples/store",
     "examples/preimage",
+    "examples/upgrade-kernel"
 ]
