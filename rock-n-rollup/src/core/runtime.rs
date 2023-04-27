@@ -93,6 +93,12 @@ pub trait Runtime: 'static {
     /// Write some data at a given path
     fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()>;
 
+    /// Write some data at a given path
+    ///
+    /// TODO: this function should always be used
+    /// The function stored_write and store_read should be removed and put in the Database plugin
+    fn store_write_raw(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()>;
+
     /// Reveal date from the reveal data directory
     fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()>;
 
@@ -229,6 +235,24 @@ impl Runtime for KernelRuntime {
             }
         }
     }
+
+    fn store_write_raw(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
+        let res = unsafe {
+            let path_len = path.len();
+            let path = path.as_ptr();
+            let num_bytes = data.len();
+            let src = data.as_ptr();
+            store_write(path, path_len, at_offset, src, num_bytes)
+        };
+        match res {
+            0 => Ok(()),
+            err => {
+                self.write_debug(&format!("error store_write_raw: {}\n", err));
+                Err(())
+            }
+        }
+    }
+
     fn store_move(&mut self, from: &str, to: &str) -> Result<(), ()> {
         let res = unsafe { store_move(from.as_ptr(), from.len(), to.as_ptr(), to.len()) };
         match res {
@@ -304,6 +328,11 @@ impl Runtime for MockRuntime {
     fn reveal_preimage(&mut self, _hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
         todo!()
     }
+
+    fn store_write_raw(&mut self, _path: &str, _data: &[u8], _at_offset: usize) -> Result<(), ()> {
+        todo!()
+    }
+
     fn store_move(&mut self, _from: &str, _to: &str) -> Result<(), ()> {
         todo!()
     }
