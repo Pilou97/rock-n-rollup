@@ -7,3 +7,5 @@ pub mod crypto;
 pub mod database;
 
 pub mod dac;
+
+pub mod installer;
