@@ -10,3 +10,5 @@
   - [Crypto](./plugins/crypto.md)
   - [Database](./plugins/database.md)
   - [Dac](./plugins/dac.md)
+- [Services](./services.md)
+  - [TicketUpgrade](./services/ticket-upgrade.md)
