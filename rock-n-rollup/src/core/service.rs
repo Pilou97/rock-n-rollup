@@ -752,7 +752,7 @@ where
         Self {
             guards: Default::default(),
             transitions: Default::default(),
-            state: state,
+            state,
         }
     }
 }
@@ -803,7 +803,7 @@ where
 
                 for transition in self.transitions.iter_mut() {
                     println!("transition");
-                    let _ = transition(runtime, &input, &state);
+                    let _ = transition(runtime, &input, state);
                 }
             }
         }
@@ -841,22 +841,21 @@ where
     }
 }
 
-pub trait IntoService<R, P>
+pub trait IntoService<R, P, S>
 where
     R: Runtime,
     P: FromRawInput,
-    Self: Sized,
 {
-    fn into_service(self) -> Service<R, P, Self>;
+    fn into_service(self) -> Service<R, P, S>;
 }
 
-impl<R, S, P> IntoService<R, P> for S
+impl<R, P, S> IntoService<R, P, S> for Service<R, P, S>
 where
     R: Runtime,
     P: FromRawInput,
 {
-    fn into_service(self) -> Service<R, P, Self> {
-        Service::new(self)
+    fn into_service(self) -> Service<R, P, S> {
+        self
     }
 }
 
@@ -985,15 +984,27 @@ mod tests {
         _data: String,
     }
 
+    fn custom_transition<R: Runtime>(_: &mut R) {}
+
+    impl<R> IntoService<R, Vec<u8>, CustomService> for CustomService
+    where
+        R: Runtime,
+    {
+        fn into_service(self) -> Service<R, Vec<u8>, Self> {
+            let mut service = Service::<R, Vec<u8>, Self>::new(self);
+            service.register(custom_transition);
+            service
+        }
+    }
+
     #[test]
     fn test_2() {
         let mut runtime = MockRuntime::default();
         let mut application = Application::new(&mut runtime);
 
-        let service: Service<_, (), CustomService> = CustomService {
+        let service = CustomService {
             _data: "some data".to_string(),
-        }
-        .into_service();
+        };
 
         application.service(service).run();
     }

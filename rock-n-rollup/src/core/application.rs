@@ -1,6 +1,6 @@
 use super::{
     service::{Input, IntoTransition, Runnable, Service},
-    Runtime,
+    FromRawInput, IntoService, Runtime,
 };
 
 pub struct Application<'a, R>
@@ -26,7 +26,13 @@ impl<'a, R: Runtime + 'static> Application<'a, R> {
         self
     }
 
-    pub fn service(&mut self, service: impl Runnable<R> + 'static) -> &mut Self {
+    pub fn service<P, S>(&mut self, service: impl IntoService<R, P, S> + 'static) -> &mut Self
+    where
+        P: FromRawInput + 'static,
+        S: 'static,
+    {
+        let service = service.into_service();
+
         let boxed = Box::new(service);
         self.services.push(boxed);
         self

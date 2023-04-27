@@ -16,4 +16,6 @@ pub use runtime::Runtime;
 pub use service::FromInput;
 pub use service::FromRawInput;
 pub use service::Input;
+pub use service::IntoService;
+pub use service::Runnable;
 pub use service::Service;
