@@ -93,7 +93,7 @@ where
 
         match (signature, public_key) {
             (Signature::Ed25519(sig), PublicKey::Ed25519(pkey)) => {
-                let res = pkey.verify(data, &sig);
+                let res = pkey.verify(data, sig);
                 res.is_ok()
             }
         }
