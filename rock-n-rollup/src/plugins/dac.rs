@@ -29,6 +29,15 @@ impl<'a> TryFrom<&'a [u8]> for PreimageHash {
     }
 }
 
+impl<'a> TryFrom<&'a Vec<u8>> for PreimageHash {
+    type Error = ();
+
+    fn try_from(value: &'a Vec<u8>) -> Result<Self, Self::Error> {
+        let inner = value.clone().try_into().map_err(|_| ())?;
+        Ok(Self { inner })
+    }
+}
+
 impl PreimageHash {
     fn new(inner: [u8; PREIMAGE_HASH_SIZE]) -> Self {
         Self { inner }
@@ -175,7 +184,7 @@ pub fn reveal_loop<Host: Runtime>(
     match page {
         SlicePage::V0HashPage(hashes) => {
             for hash in hashes.hashes() {
-                let hash = PreimageHash::new(hash.clone()); // TODO: avoid cloning
+                let hash = PreimageHash::new(*hash); // TODO: avoid cloning
                 reveal_loop(host, level + 1, &hash, max_dac_levels, acc)?;
             }
             Ok(())
@@ -199,7 +208,7 @@ where
 {
     fn read_from_dac(&mut self, hash: &PreimageHash) -> Result<Vec<u8>, ()> {
         let mut data = Vec::default();
-        let () = reveal_loop(self, 0, hash, 3, &mut data)?;
+        reveal_loop(self, 0, hash, 3, &mut data)?;
         let data = data.iter().flatten().copied().collect::<Vec<u8>>();
         Ok(data)
     }
