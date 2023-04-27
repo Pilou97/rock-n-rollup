@@ -17,7 +17,7 @@ pub fn transition<R: Runtime + Logger>(rt: &mut R, _: External<String>) {
                 if let Ok(()) = rt.store_delete("/test") {
                     rt.info("Delete is a success");
                     let read = rt.store_read("/test");
-                    if let None = read {
+                    if read.is_none() {
                         rt.info("Data is not there");
                     }
                 } else {
