@@ -141,7 +141,7 @@ where
         _: &S,
     ) -> Result<Self, ()> {
         // TODO: find a better serialization protocol;
-        let bytes = (&input.payload.payload).clone();
+        let bytes = input.payload.payload.clone();
         let string = String::from_utf8(bytes).map_err(|_| ())?;
         let payload = serde_json_wasm::from_str::<P>(&string).map_err(|_| ())?;
         Ok(Json { payload })
