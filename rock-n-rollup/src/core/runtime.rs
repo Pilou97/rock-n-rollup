@@ -64,6 +64,14 @@ extern "C" {
         dst: *mut u8,
         max_bytes: usize,
     ) -> i32;
+
+    /// Returns 0 in case of success, or an error code.
+    pub fn store_move(
+        src_path: *const u8,
+        scr_path_len: usize,
+        dst_path: *const u8,
+        dst_path_len: usize,
+    ) -> i32;
 }
 
 pub trait Runtime: 'static {
@@ -87,6 +95,9 @@ pub trait Runtime: 'static {
 
     /// Reveal date from the reveal data directory
     fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()>;
+
+    /// Move the data to another path
+    fn store_move(&mut self, from: &str, to: &str) -> Result<(), ()>;
 }
 
 #[derive(Default)]
@@ -218,6 +229,13 @@ impl Runtime for KernelRuntime {
             }
         }
     }
+    fn store_move(&mut self, from: &str, to: &str) -> Result<(), ()> {
+        let res = unsafe { store_move(from.as_ptr(), from.len(), to.as_ptr(), to.len()) };
+        match res {
+            0 => Ok(()),
+            _ => Err(()),
+        }
+    }
 }
 
 pub struct MockRuntime {
@@ -284,6 +302,9 @@ impl Runtime for MockRuntime {
     }
 
     fn reveal_preimage(&mut self, _hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
+        todo!()
+    }
+    fn store_move(&mut self, _from: &str, _to: &str) -> Result<(), ()> {
         todo!()
     }
 }
