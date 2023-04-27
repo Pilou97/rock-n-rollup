@@ -1,12 +1,14 @@
 [package]
 name = "rock-n-rollup"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 authors = ["Pierre-Louis Dubois <pierrelouis.dubois@tutanota.com>"]
 license ="MIT"
 description = "Framework to ease the development of smart rollups on Tezos"
 repository = "https://github.com/Pilou97/rock-n-rollup"
 keywords = ["tezos", "macro", "kernel", "smart-rollup", "rollup"]
+homepage = "https://pilou97.github.io/rock-n-rollup/"
+readme = "readme.md"
 
 [features]
 all = ["external", "internal", "logger", "hasher"]
