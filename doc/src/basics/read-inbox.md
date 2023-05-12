@@ -1,4 +1,4 @@
-# Start of level, Info per level, End of level
+# Internal Messages
 
 Smart rollups always inject 3 messages in the inbox:
 
@@ -42,20 +42,3 @@ fn transition<R: Runtime>(rt: &mut R, msg: External<Vec<u8>>) {
 
 At this point, you get all the features as the already provided kernel library provided by Tezos code dev.
 You can define transitions on any messages
-
-# Transfer
-
-An input message can also be a `Transfer` message with a michelson payload.
-Let's say you want to receive some bytes ticket, you can add the folow:
-
-```rust
-fn transfer<R: Runtime>(rt: &mut R, msg: Internal<Transfer<Ticket<MichelsonBytes>>>) {
-    let transfer = msg.payload();
-    let ticket = transfer.payload();
-    let destination = transfer.destination();
-    let source = transfer.source();
-    let sender = transfer.sender();
-}
-```
-
-Basicaly the generic type of Transfer can be any michelson operation

@@ -4,6 +4,8 @@
 - [Basics](./basics/index.md)
   - [Getting start](./basics/getting-started.md)
   - [Read the Inbox](./basics/read-inbox.md)
+    - [Custom External messages](./basics/external-messages.md)
+    - [Custom Transfer](./basics/transfer.md)
 - [Plugins](./plugins/index.md)
   - [Logger](./plugins/logger.md)
   - [Hasher](./plugins/hasher.md)
