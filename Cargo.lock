@@ -257,6 +257,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "everything"
+version = "0.1.0"
+dependencies = [
+ "rock-n-rollup 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "ff"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -312,7 +319,7 @@ dependencies = [
 name = "hello-world"
 version = "0.1.0"
 dependencies = [
- "rock-n-rollup",
+ "rock-n-rollup 0.0.4",
 ]
 
 [[package]]
@@ -534,7 +541,7 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 name = "preimage"
 version = "0.1.0"
 dependencies = [
- "rock-n-rollup",
+ "rock-n-rollup 0.0.4",
 ]
 
 [[package]]
@@ -616,7 +623,7 @@ dependencies = [
 name = "read-input"
 version = "0.1.0"
 dependencies = [
- "rock-n-rollup",
+ "rock-n-rollup 0.0.4",
 ]
 
 [[package]]
@@ -646,7 +653,27 @@ dependencies = [
  "ed25519-compact",
  "hex",
  "nom",
- "rock-n-rollup-macro",
+ "rock-n-rollup-macro 0.0.2",
+ "serde",
+ "serde-json-wasm",
+ "sha2",
+ "tezos-smart-rollup-encoding",
+ "tezos_data_encoding",
+]
+
+[[package]]
+name = "rock-n-rollup"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4eba0f7364ab00b917d4346a1e53b1a55be84233c41532f5105d8c313edd4fd"
+dependencies = [
+ "base58",
+ "bincode",
+ "blake2",
+ "ed25519-compact",
+ "hex",
+ "nom",
+ "rock-n-rollup-macro 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde-json-wasm",
  "sha2",
@@ -657,6 +684,16 @@ dependencies = [
 [[package]]
 name = "rock-n-rollup-macro"
 version = "0.0.2"
+dependencies = [
+ "quote",
+ "syn 2.0.15",
+]
+
+[[package]]
+name = "rock-n-rollup-macro"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7fe60693670f113f087048f55caebca9634c68a7fc35ddb597e75b965da85e8"
 dependencies = [
  "quote",
  "syn 2.0.15",
@@ -730,7 +767,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 name = "store"
 version = "0.1.0"
 dependencies = [
- "rock-n-rollup",
+ "rock-n-rollup 0.0.4",
 ]
 
 [[package]]
@@ -954,7 +991,7 @@ checksum = "1dd624098567895118886609431a7c3b8f516e41d30e0643f03d94592a147e36"
 name = "upgrade-kernel"
 version = "0.1.0"
 dependencies = [
- "rock-n-rollup",
+ "rock-n-rollup 0.0.4",
 ]
 
 [[package]]
