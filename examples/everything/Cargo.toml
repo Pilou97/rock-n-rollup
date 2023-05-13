@@ -9,4 +9,4 @@ crate-type = ["rlib", "cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rock-n-rollup = "0.0.4"
+rock-n-rollup = {path = "../../rock-n-rollup"}
