@@ -9,11 +9,12 @@ First question, what is a plugin? A plugin is an **augmented** runtime. Basicall
 Basically a plugin is a trait that is implemented for any runtime. So when you want to use the plugin you can add a constraint on the `Runtime`:
 
 ```rust, noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::Runtime;
-use rock_n_rollup::plugins::database::Database;
+use rock_n_rollup::plugins::logger::Logger;
 
-fn transition<R: Runtime + Database>(rt: &mut R) {
-    let _ = rt.get::<u32>("/data");
+fn transition<R: Runtime + Logger>(rt: &mut R) {
+    rt.log("Hello kernel");
 }
 # fn main() {}
 ```
@@ -21,10 +22,11 @@ fn transition<R: Runtime + Database>(rt: &mut R) {
 If you don't care of the `Runtime` you can restrict your function to your plugin and only your plugin:
 
 ```rust, noplayground
-use rock_n_rollup::plugins::database::Database;
+# extern crate rock_n_rollup;
+use rock_n_rollup::plugins::logger::Logger;
 
-fn transition<R: Database>(rt: &mut R) {
-    let _ = rt.get::<u32>("/data");
+fn transition<R: Logger>(rt: &mut R) {
+    rt.log("Hello kernel");
 }
 # fn main() {}
 ```
@@ -32,13 +34,15 @@ fn transition<R: Database>(rt: &mut R) {
 And of course, you can compose plugins with each other
 
 ```rust
+# extern crate rock_n_rollup;
 use rock_n_rollup::plugins::logger::Logger;
-use rock_n_rollup::plugins::database::Database;
+use rock_n_rollup::plugins::hasher::Hasher;
 
 
-fn transition<R: Logger + Database >(rt: &mut R) {
+fn transition<R: Logger + Hasher >(rt: &mut R) {
+    let data = "Hello world";
     rt.info("Hello world");
-    let _ = rt.get::<u32>("/data");
+    let hash = rt.hash(data.as_bytes());
 }
 # fn main() {}
 ```
@@ -64,6 +68,7 @@ trait Identity {
 2. Implement this trait for any Runtime
 
 ```rust
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::Runtime;
 # trait Identity {
 #    fn identity<P>(&mut self, param: P) -> P;
@@ -83,6 +88,7 @@ where
 Tips, you can also compose plugins
 
 ```rust
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::Runtime;
 use rock_n_rollup::plugins::logger::Logger;
 # trait Identity {
@@ -106,6 +112,7 @@ where
 Because you have implemented your trait for all `Runtime`, you can directly use the `MockRuntime` to test your plugin.
 
 ```rust
+# extern crate rock_n_rollup;
 # use rock_n_rollup::core::Runtime;
 # use rock_n_rollup::plugins::logger::Logger;
 # trait Identity {

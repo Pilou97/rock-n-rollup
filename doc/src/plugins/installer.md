@@ -4,6 +4,7 @@ You may want to upgrade your kernel.
 The `Installer` plugin expose a function to install properly a new kernel.
 
 ```rust
+# extern crate rock_n_rollup;
 use rock_n_rollup::plugins::installer::*;
 
 fn transition<R: Installer>(rt: &mut R) {

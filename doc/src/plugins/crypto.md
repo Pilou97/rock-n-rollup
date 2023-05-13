@@ -6,7 +6,8 @@ The `Crypto` plugin gives you access to cryptography primitive, like public key 
 
 It defines the `PublicKey` and the `Signature` type. These types can be constructed from a String:
 
-```rust
+```rust, noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::plugins::crypto::*;
 
 fn my_function() {
@@ -23,7 +24,8 @@ fn my_function() {
 
 Let's say you have a `transition`. If you want to use the crypto plugin you just have to add the Crypto trait to the Runtime constraint:
 
-```rust
+```rust, noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::plugins::crypto::*;
 
 fn transition<R: Verifier>(rt: &mut R) {

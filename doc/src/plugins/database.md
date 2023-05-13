@@ -6,7 +6,6 @@ The only thing things you need to use the database is to derive `Serialize` and 
 
 ```rust
 # extern crate rock_n_rollup;
-
 use rock_n_rollup::plugins::database::{Database, Json};
 
 fn transition<R: Database<Json>>(rt: &mut R) {

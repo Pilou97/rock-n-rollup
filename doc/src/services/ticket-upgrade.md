@@ -31,6 +31,7 @@ Here is the minimal specification of the smart contract:
 Let's say you have your application, if you want to add the service the only things you have to do is the following:
 
 ```rust
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::{Runtime, Application};
 use rock_n_rollup::services::ticket_upgrade::TicketUpgrade;
 

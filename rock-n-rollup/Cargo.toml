@@ -9,6 +9,7 @@ repository = "https://github.com/Pilou97/rock-n-rollup"
 keywords = ["tezos", "macro", "kernel", "smart-rollup", "rollup"]
 homepage = "https://pilou97.github.io/rock-n-rollup/"
 readme = "readme.md"
+build = "build.rs"
 
 [lib]
 crate-type = ["rlib", "cdylib"]
@@ -26,3 +27,9 @@ hex = "0.4.3"
 nom = "6.1"
 tezos-smart-rollup-encoding = "0.1.0"
 tezos_data_encoding = "0.4.4"
+
+[build-dependencies]
+skeptic = "0.13"
+
+[dev-dependencies]
+skeptic = "0.13"

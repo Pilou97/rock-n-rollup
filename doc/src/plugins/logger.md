@@ -12,6 +12,7 @@ The `Logger` plugin is a simple plugin. It adds to the runtime 5 functions:
 Let's say you have a `transition`. If you want to use the logger you just add to add the Logger trait to the Runtime constraint:
 
 ```rust
+# extern crate rock_n_rollup;
 use rock_n_rollup::plugins::logger::Logger;
 
 fn transition<R: Logger>(rt: &mut R) {

@@ -8,6 +8,5 @@ members = [
     "examples/preimage",
     "examples/upgrade-kernel",
     "examples/everything",
-    "examples/database",
-    "doc"
+    "examples/database"
 ]

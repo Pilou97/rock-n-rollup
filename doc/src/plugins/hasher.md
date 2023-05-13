@@ -10,6 +10,7 @@ The `Hasher` plugin gives you access to blake2b hashing algorithm with the follo
 Let's say you have a `transition`. If you want to use the hasher you just add to add the Hasher trait to the Runtime constraint:
 
 ```rust
+# extern crate rock_n_rollup;
 use rock_n_rollup::plugins::hasher::Hasher;
 
 fn transition<R: Hasher>(rt: &mut R) {

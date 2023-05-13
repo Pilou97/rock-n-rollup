@@ -10,6 +10,7 @@ Smart rollups always inject 3 messages in the inbox:
 An easy way to execute a transition of this kind of message, is to add a parameter to your transition function:
 
 ```rust, noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::services::internal::*;
 use rock_n_rollup::core::Runtime;
 
@@ -37,6 +38,7 @@ Message from users can come from the `add_rollup_message` tezos operation, the m
 If you want to trigger a transition on a `External` message, you just have to add a parameter to your transition function:
 
 ```rust, noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::services::external::*;
 use rock_n_rollup::core::Runtime;
 

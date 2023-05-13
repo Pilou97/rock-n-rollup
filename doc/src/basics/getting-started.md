@@ -34,6 +34,7 @@ Transition functions accept zero or more parameters. These parameters can be ext
 Replace the contents of `src/lib.rs` with the following:
 
 ```rust,noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::Runtime;
 
 fn hello<R: Runtime>(rt: &mut R) {
@@ -45,6 +46,7 @@ fn hello<R: Runtime>(rt: &mut R) {
 Next, create a `main` function, that accept an `Application` as parameters. Use `App.register` to add a transition to your application. Finnaly the app is started by calling `run` on it.
 
 ```rust,noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::Application;
 use rock_n_rollup::core::Runtime;
 

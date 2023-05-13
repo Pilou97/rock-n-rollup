@@ -4,6 +4,7 @@ An internal input message can also be a `Transfer` message with a michelson payl
 Let's say you want to receive some bytes ticket, you can add the follow:
 
 ```rust, noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::Runtime;
 use rock_n_rollup::services::internal::*;
 use rock_n_rollup::core::michelson::*;
@@ -22,6 +23,7 @@ fn transfer<R: Runtime>(rt: &mut R, msg: Internal<Transfer<Ticket<MichelsonBytes
 Your transition will be executed when the payload is a transfer of byte tickets:
 
 ```rust, noplayground
+# extern crate rock_n_rollup;
 use rock_n_rollup::core::{Runtime, Application};
 # use rock_n_rollup::services::internal::*;
 # use rock_n_rollup::core::michelson::*;
