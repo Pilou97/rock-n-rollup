@@ -31,15 +31,16 @@ Here is the minimal specification of the smart contract:
 Let's say you have your application, if you want to add the service the only things you have to do is the following:
 
 ```rust
-fn main<R: Runtime>(application: &mut Application<Runtime>) {
+use rock_n_rollup::core::{Runtime, Application};
+use rock_n_rollup::services::ticket_upgrade::TicketUpgrade;
+
+#[rock_n_rollup::main]
+fn kernel_entry<R: Runtime>(application: &mut Application<R>) {
     application
         .service(TicketUpgrade::new("KT1...")) // Put the address of your L1 contract
-        .transition(...)
-        .transition(...)
-        .transition(...)
-        .transition(...)
         .run()
 }
+# fn main(){}
 ```
 
 Then when your kernel will receive a root hash from this contract it will proceed to the installation of your new kernel.

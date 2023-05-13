@@ -1,0 +1,5 @@
+/* Hide the eye button */
+.fa-eye, .boring {
+    display: none;
+}
+  

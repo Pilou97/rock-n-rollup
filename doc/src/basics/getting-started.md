@@ -17,38 +17,46 @@ cd hello-kernel
 
 Add a `lib` section to your Cargo.toml:
 
-```
+```toml
 [lib]
 crate-type = ["rlib", "cdylib"]
 ```
 
 Add `rock-n-rollup` as a dependency of your project by adding the following to your `Cargo.toml` file.
 
-```
+```toml
 [dependencies]
-rock-n-rollup = "0.0.3"
+rock-n-rollup = "0.0.4"
 ```
 
 Transition functions accept zero or more parameters. These parameters can be extracted from an input (see `FromInput` trait) and returns void.
 
 Replace the contents of `src/lib.rs` with the following:
 
-```rust
-use rock_n_rollup::core::{Application, Runtime};
-
+```rust,noplayground
+use rock_n_rollup::core::Runtime;
 
 fn hello<R: Runtime>(rt: &mut R) {
     rt.write_debug("Hello kernel!");
 }
+# fn main(){}
 ```
 
 Next, create a `main` function, that accept an `Application` as parameters. Use `App.register` to add a transition to your application. Finnaly the app is started by calling `run` on it.
 
-```rust
+```rust,noplayground
+use rock_n_rollup::core::Application;
+use rock_n_rollup::core::Runtime;
+
+fn hello<R: Runtime>(rt: &mut R) {
+    rt.write_debug("Hello kernel!");
+}
+
 #[rock_n_rollup::main]
-pub fn main<R: Runtime>(application: &mut Application<R>) {
+pub fn kernel_entry<R: Runtime>(application: &mut Application<R>) {
     application.register(hello).run();
 }
+# fn main(){}
 ```
 
 That's it! It should compile with `cargo build --release --target wasm32-unknown-unknown`

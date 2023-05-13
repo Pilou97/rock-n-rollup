@@ -10,9 +10,12 @@ The `Hasher` plugin gives you access to blake2b hashing algorithm with the follo
 Let's say you have a `transition`. If you want to use the hasher you just add to add the Hasher trait to the Runtime constraint:
 
 ```rust
-fn transition<H: Hasher>(hasher: &mut H) {
-    let hash1 = hasher.hash(vec![0x01, 0x02, 0x03, 0x03]);
-    let string: String = hash1.to_string();
-    assert!(hash1 == hash2);
+use rock_n_rollup::plugins::hasher::Hasher;
+
+fn transition<R: Hasher>(rt: &mut R) {
+    let data = b"Hello world";
+    let hash = rt.hash(data);
+    let string: String = hash.to_string();
 }
+# fn main(){}
 ```
