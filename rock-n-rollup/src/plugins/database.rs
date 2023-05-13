@@ -1,14 +1,65 @@
-use std::{mem::size_of, println};
+use std::mem::size_of;
 
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::core::Runtime;
 
+pub trait Backend {
+    fn to_bytes<P>(data: &P) -> Result<Vec<u8>, ()>
+    where
+        P: Serialize;
+
+    fn from_bytes<P>(bytes: &[u8]) -> Result<P, ()>
+    where
+        P: DeserializeOwned;
+}
+
+/// Json backend for the database
+pub struct Json {}
+
+impl Backend for Json {
+    fn to_bytes<P>(data: &P) -> Result<Vec<u8>, ()>
+    where
+        P: Serialize,
+    {
+        serde_json_wasm::to_vec(data).map_err(|_| ())
+    }
+
+    fn from_bytes<P>(bytes: &[u8]) -> Result<P, ()>
+    where
+        P: DeserializeOwned,
+    {
+        serde_json_wasm::from_slice(bytes).map_err(|_| ())
+    }
+}
+
+/// Bincode backend for the database
+pub struct Bincode {}
+
+impl Backend for Bincode {
+    fn to_bytes<P>(data: &P) -> Result<Vec<u8>, ()>
+    where
+        P: Serialize,
+    {
+        bincode::serialize(data).map_err(|_| ())
+    }
+
+    fn from_bytes<P>(bytes: &[u8]) -> Result<P, ()>
+    where
+        P: DeserializeOwned,
+    {
+        bincode::deserialize(&bytes).map_err(|_| ())
+    }
+}
+
 /// Database to read and write data from the durable storage
 ///
 ///
 /// Each field of the struct will be written in the
-pub trait Database {
+pub trait Database<B>
+where
+    B: Backend,
+{
     /// Get the data from the database at a given path
     fn get<D>(&mut self, path: &str) -> Result<Option<D>, ()>
     where
@@ -20,9 +71,10 @@ pub trait Database {
         D: Serialize;
 }
 
-impl<R> Database for R
+impl<R, B> Database<B> for R
 where
     R: Runtime,
+    B: Backend,
 {
     fn get<D>(&mut self, path: &str) -> Result<Option<D>, ()>
     where
@@ -44,7 +96,7 @@ where
         match bytes {
             None => Ok(None),
             Some(bytes) => {
-                let decoded = bincode::deserialize(&bytes).map_err(|_| ())?;
+                let decoded = B::from_bytes(&bytes)?;
                 Ok(Some(decoded))
             }
         }
@@ -54,15 +106,15 @@ where
     where
         D: Serialize,
     {
-        let encoded: Vec<u8> = bincode::serialize(data).map_err(|_| ())?;
-        let size = encoded.len();
+        let bytes = B::to_bytes(data)?;
+        let size = bytes.len();
         let usize_size = size_of::<usize>();
         let size_bytes = size.to_be_bytes();
 
         // Let's write the size at the beginning
         self.store_write(path, &size_bytes, 0).map_err(|_| ())?;
 
-        match self.store_write(path, &encoded, usize_size) {
+        match self.store_write(path, &bytes, usize_size) {
             Ok(_) => Ok(data),
             Err(_) => Err(()),
         }
@@ -73,19 +125,30 @@ where
 mod tests {
     use std::println;
 
-    use crate::core::MockRuntime;
+    use crate::{core::MockRuntime, plugins::database::Bincode};
 
-    use super::Database;
+    use super::{Backend, Database, Json};
 
-    #[test]
-    fn test() {
+    fn test_backend<B: Backend>() {
         let mut runtime = MockRuntime::default();
         let data = "Hello world".to_string();
 
-        let _ = runtime.save("/greet", &data).unwrap();
+        let _ = <MockRuntime as Database<B>>::save(&mut runtime, "/greet", &data).unwrap();
         println!("saved");
-        let greetings = runtime.get::<String>("/greet").unwrap().unwrap();
+        let greetings = <MockRuntime as Database<B>>::get::<String>(&mut runtime, "/greet")
+            .unwrap()
+            .unwrap();
 
         assert_eq!(greetings, data)
+    }
+
+    #[test]
+    fn test_json() {
+        test_backend::<Json>()
+    }
+
+    #[test]
+    fn test_bincode() {
+        test_backend::<Bincode>()
     }
 }

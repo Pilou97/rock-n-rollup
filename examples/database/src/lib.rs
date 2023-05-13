@@ -1,9 +1,9 @@
 use rock_n_rollup::{
     core::{Application, Runtime},
-    plugins::database::Database,
+    plugins::database::{Database, Json},
 };
 
-pub fn hello<R: Database>(rt: &mut R) {
+pub fn hello<R: Database<Json>>(rt: &mut R) {
     let data = "Hello world";
 
     let _ = rt.save("/data", &data.to_string());

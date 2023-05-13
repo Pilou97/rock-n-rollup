@@ -4,7 +4,7 @@ use crate::{
     core::{FromInput, FromRawInput},
     plugins::{
         crypto::{PublicKey, Signature, Verifier},
-        database::Database,
+        database::{Bincode, Database},
         hasher::Hasher,
     },
 };
@@ -78,7 +78,7 @@ fn try_from_bytes(value: &[u8]) -> Result<RawExternalOperation, ()> {
 }
 
 impl FromRawInput for RawExternalOperation {
-    fn from_raw_input<R: Database + Hasher + Verifier>(
+    fn from_raw_input<R: Database<Bincode> + Hasher + Verifier>(
         runtime: &mut R,
         raw_input: &crate::core::RawInput,
     ) -> Result<Self, ()> {
