@@ -5,9 +5,11 @@ The `Database` plugin gives you an easier way to read and to write data to the d
 The only thing things you need to use the database is to derive `Serialize` and `Deserialize` on your custom types, and you ready to go.
 
 ```rust
-use rock_n_rollup::plugins::database::Database;
+# extern crate rock_n_rollup;
 
-fn transition<R: Database>(rt: &mut R) {
+use rock_n_rollup::plugins::database::{Database, Json};
+
+fn transition<R: Database<Json>>(rt: &mut R) {
     let greetings = "Hello world!".to_string();
 
     let _ = rt.save("/greet", &greetings);
