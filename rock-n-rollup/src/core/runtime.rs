@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, println};
 
 use super::constants::PREIMAGE_HASH_SIZE;
 
@@ -88,16 +88,13 @@ pub trait Runtime: 'static {
     fn store_delete(&mut self, path: &str) -> Result<(), ()>;
 
     /// Read some data at a given path
-    fn store_read(&mut self, path: &str) -> Option<Vec<u8>>;
-
-    /// Write some data at a given path
-    fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()>;
+    fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>>;
 
     /// Write some data at a given path
     ///
     /// TODO: this function should always be used
     /// The function stored_write and store_read should be removed and put in the Database plugin
-    fn store_write_raw(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()>;
+    fn store_write(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()>;
 
     /// Reveal date from the reveal data directory
     fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()>;
@@ -157,67 +154,39 @@ impl Runtime for KernelRuntime {
         }
     }
 
-    fn store_read(&mut self, path: &str) -> Option<Vec<u8>> {
+    fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>> {
         if !self.store_is_present(path) {
             return None;
         }
 
         let ptr = path.as_ptr();
         let path_len = path.len();
-        let usize_size = std::mem::size_of::<usize>();
-
-        let size = unsafe {
-            let mut buffer = Vec::with_capacity(usize_size);
-            let dst = buffer.as_mut_ptr();
-            let _ = store_read(ptr, path_len, 0, dst, usize_size);
-            buffer.set_len(usize_size);
-            let be_bytes = buffer.try_into().unwrap(); // Should be ok
-            usize::from_be_bytes(be_bytes)
-        };
-
         let mut buffer = Vec::with_capacity(size);
         let dst = buffer.as_mut_ptr();
         unsafe {
-            let _ = store_read(ptr, path_len, usize_size, dst, size);
+            let _ = store_read(ptr, path_len, offset, dst, size);
             buffer.set_len(size);
         }
 
         Some(buffer)
     }
 
-    fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()> {
-        let ptr = path.as_ptr();
-        let length = data.len();
-
-        let mut length_bytes = length.to_be_bytes().to_vec();
-
-        let (length_res, data_res) = unsafe {
-            // First we wrote the size of the data, this size has an known size
-            let res1 = store_write(
-                ptr,
-                path.len(),
-                0,
-                length_bytes.as_mut_ptr(),
-                length_bytes.len(),
-            );
-
-            // Then we write the data
-            let res2 = store_write(
-                ptr,
-                path.len(),
-                length_bytes.len(),
-                data.as_ptr(),
-                data.len(),
-            );
-            (res1, res2)
+    fn store_write(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
+        let res = unsafe {
+            let path_len = path.len();
+            let path = path.as_ptr();
+            let num_bytes = data.len();
+            let src = data.as_ptr();
+            store_write(path, path_len, at_offset, src, num_bytes)
         };
-
-        match (length_res, data_res) {
-            (0, 0) => Ok(()),
-            _ => Err(()),
+        match res {
+            0 => Ok(()),
+            err => {
+                self.write_debug(&format!("error store_write_raw: {}\n", err));
+                Err(())
+            }
         }
     }
-
     fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
         let max_size = 4096;
         let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE as usize);
@@ -232,23 +201,6 @@ impl Runtime for KernelRuntime {
                 let size = usize::try_from(size).unwrap();
                 payload.set_len(size);
                 Ok(payload)
-            }
-        }
-    }
-
-    fn store_write_raw(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
-        let res = unsafe {
-            let path_len = path.len();
-            let path = path.as_ptr();
-            let num_bytes = data.len();
-            let src = data.as_ptr();
-            store_write(path, path_len, at_offset, src, num_bytes)
-        };
-        match res {
-            0 => Ok(()),
-            err => {
-                self.write_debug(&format!("error store_write_raw: {}\n", err));
-                Err(())
             }
         }
     }
@@ -316,20 +268,40 @@ impl Runtime for MockRuntime {
         todo!()
     }
 
-    fn store_read(&mut self, path: &str) -> Option<Vec<u8>> {
-        self.storage.get(path).cloned()
+    fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>> {
+        let bytes = self.storage.get(path).cloned()?;
+        if offset + size <= bytes.len() {
+            let data = &bytes[offset..offset + size].to_vec();
+            Some(data.clone())
+        } else {
+            todo!()
+        }
     }
 
-    fn store_write(&mut self, path: &str, data: &[u8]) -> Result<(), ()> {
-        self.storage.insert(path.to_string(), data.to_vec());
-        Ok(())
+    fn store_write(&mut self, path: &str, data: &[u8], offset: usize) -> Result<(), ()> {
+        let buffer = self.storage.get(path).cloned();
+        match buffer {
+            None => {
+                self.storage.insert(path.to_string(), data.to_vec());
+                println!("there");
+                Ok(())
+            }
+            Some(mut buffer) => {
+                if offset == buffer.len() {
+                    println!("ici");
+                    let mut data = data.to_vec();
+                    buffer.append(&mut data);
+                    println!("{:?}", &buffer);
+                    self.storage.insert(path.to_string(), buffer.to_vec());
+                    Ok(())
+                } else {
+                    todo!()
+                }
+            }
+        }
     }
 
     fn reveal_preimage(&mut self, _hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
-        todo!()
-    }
-
-    fn store_write_raw(&mut self, _path: &str, _data: &[u8], _at_offset: usize) -> Result<(), ()> {
         todo!()
     }
 

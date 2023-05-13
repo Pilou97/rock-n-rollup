@@ -1,3 +1,5 @@
+use std::{mem::size_of, println};
+
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::core::Runtime;
@@ -26,7 +28,19 @@ where
     where
         D: DeserializeOwned,
     {
-        let bytes = self.store_read(path);
+        // The n first bytes represent the size
+        let usize_size = size_of::<usize>();
+        let size = self
+            .store_read(path, 0, usize_size)
+            .unwrap_or_default()
+            .try_into()
+            .map_err(|_| ())?;
+        let size = usize::from_be_bytes(size);
+
+        println!("size to read: {}", size);
+
+        let bytes = self.store_read(path, usize_size, size);
+
         match bytes {
             None => Ok(None),
             Some(bytes) => {
@@ -41,8 +55,14 @@ where
         D: Serialize,
     {
         let encoded: Vec<u8> = bincode::serialize(data).map_err(|_| ())?;
+        let size = encoded.len();
+        let usize_size = size_of::<usize>();
+        let size_bytes = size.to_be_bytes();
 
-        match self.store_write(path, &encoded) {
+        // Let's write the size at the beginning
+        self.store_write(path, &size_bytes, 0).map_err(|_| ())?;
+
+        match self.store_write(path, &encoded, usize_size) {
             Ok(_) => Ok(data),
             Err(_) => Err(()),
         }
@@ -51,6 +71,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::println;
+
     use crate::core::MockRuntime;
 
     use super::Database;
@@ -60,7 +82,8 @@ mod tests {
         let mut runtime = MockRuntime::default();
         let data = "Hello world".to_string();
 
-        let _ = runtime.save("/greet", &data);
+        let _ = runtime.save("/greet", &data).unwrap();
+        println!("saved");
         let greetings = runtime.get::<String>("/greet").unwrap().unwrap();
 
         assert_eq!(greetings, data)

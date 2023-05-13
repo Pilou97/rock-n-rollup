@@ -25,7 +25,7 @@ where
                 Err(()) => Err(()),
                 Ok(kernel_size) => {
                     let chunk_size = chunk.len();
-                    self.store_write_raw(path, chunk, kernel_size)?;
+                    self.store_write(path, chunk, kernel_size)?;
                     Ok(kernel_size + chunk_size)
                 }
             })?;

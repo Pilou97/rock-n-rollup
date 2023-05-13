@@ -5,7 +5,6 @@ members = [
     "kernel-macro",
     "examples/hello-world",
     "examples/read-input",
-    "examples/store",
     "examples/preimage",
     "examples/upgrade-kernel",
     "examples/everything",
