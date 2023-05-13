@@ -1,6 +1,6 @@
 [package]
 name = "rock-n-rollup"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2021"
 authors = ["Pierre-Louis Dubois <pierrelouis.dubois@tutanota.com>"]
 license ="MIT"

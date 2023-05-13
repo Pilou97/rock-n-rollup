@@ -26,7 +26,7 @@ Add `rock-n-rollup` as a dependency of your project by adding the following to y
 
 ```toml
 [dependencies]
-rock-n-rollup = "0.0.4"
+rock-n-rollup = "0.0.5"
 ```
 
 Transition functions accept zero or more parameters. These parameters can be extracted from an input (see `FromInput` trait) and returns void.
