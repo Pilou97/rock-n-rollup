@@ -98,6 +98,11 @@ tuple_from_req!(Tuple8; A, B, C, D, E, F, G, H);
 tuple_from_req!(Tuple9; A, B, C, D, E, F, G, H, I);
 
 ///// FromInput implementation
+
+/// This trait should only be used when defining a service
+///
+/// I don't remember the difference between FromRawInput and FromInput.
+/// So if you are implementing FromRawInput that's not normal
 pub trait FromRawInput
 where
     Self: Sized,
