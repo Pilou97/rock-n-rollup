@@ -6,6 +6,8 @@
   - [Read the Inbox](./basics/read-inbox.md)
     - [Custom External messages](./basics/external-messages.md)
     - [Custom Transfer](./basics/transfer.md)
+  - [Transitions](./basics/transitions.md)
+    - [Tezos Level](./basics/tezos-level.md)
 - [Plugins](./plugins/index.md)
   - [Logger](./plugins/logger.md)
   - [Hasher](./plugins/hasher.md)
