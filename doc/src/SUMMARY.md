@@ -8,6 +8,7 @@
     - [Custom Transfer](./basics/transfer.md)
   - [Transitions](./basics/transitions.md)
     - [Tezos Level](./basics/tezos-level.md)
+    - [Inbox Index](./basics/inbox-index.md)
 - [Plugins](./plugins/index.md)
   - [Logger](./plugins/logger.md)
   - [Hasher](./plugins/hasher.md)
