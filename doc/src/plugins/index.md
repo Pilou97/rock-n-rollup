@@ -1,12 +1,12 @@
 # Plugins
 
-rock-n-rollup provides many plugins to ease your developement.
+Rock-N-Rollup provides many plugins to ease your developement.
 
 First question, what is a plugin? A plugin is an **augmented** runtime. Basically a plugin is a superset of the runtime.
 
 ## How to use plugins?
 
-Basically a plugin is a trait that is implemented for any runtime. So when you want to use the plugin you can add a constraint on the `Runtime`:
+A plugin is a trait that is implemented for any runtime. So when you want to use the plugin you can add a constraint on the `Runtime`:
 
 ```rust, noplayground
 # extern crate rock_n_rollup;
@@ -19,7 +19,7 @@ fn transition<R: Runtime + Logger>(rt: &mut R) {
 # fn main() {}
 ```
 
-If you don't care of the `Runtime` you can restrict your function to your plugin and only your plugin:
+If you don't care of the `Runtime`, you can restrict your function to your plugin and only your plugin:
 
 ```rust, noplayground
 # extern crate rock_n_rollup;
@@ -39,7 +39,7 @@ use rock_n_rollup::plugins::logger::Logger;
 use rock_n_rollup::plugins::hasher::Hasher;
 
 
-fn transition<R: Logger + Hasher >(rt: &mut R) {
+fn transition<R: Logger + Hasher>(rt: &mut R) {
     let data = "Hello world";
     rt.info("Hello world");
     let hash = rt.hash(data.as_bytes());
@@ -51,12 +51,12 @@ Unfortunately there is one limitation, it's complicated to use two plugins that 
 
 ## How to develop a plugin?
 
-Let's say you want to implement your custom plugin, you can implement your plugin in 3 steps:
+Let's say you want to implement your custom plugin, you can implement it in 3 steps:
 
 1. Define a trait
 
 This trait can define any function.
-Let's implement the identity plugin: it returns the given parameter.
+Let's implement the `Identity` plugin: it returns the given parameter.
 
 ```rust
 trait Identity {
@@ -65,7 +65,7 @@ trait Identity {
 # fn main(){}
 ```
 
-2. Implement this trait for any Runtime
+2. Implement this trait for any `Runtime`
 
 ```rust
 # extern crate rock_n_rollup;
@@ -107,7 +107,7 @@ where
 # fn main(){}
 ```
 
-3. Implement some test
+3. Let's write some tests
 
 Because you have implemented your trait for all `Runtime`, you can directly use the `MockRuntime` to test your plugin.
 

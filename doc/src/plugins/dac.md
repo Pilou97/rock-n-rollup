@@ -1,6 +1,6 @@
 # Dac
 
-The `Dac` plugin gives you a way to read data from the reveal data channel (populated by the DAC)
+The `Dac` plugin gives you a way to read data from the reveal data channel (populated by the DAC).
 
 ```rust, noplayground
 # extern crate rock_n_rollup;

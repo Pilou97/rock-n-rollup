@@ -1,7 +1,7 @@
 # Installer
 
 You may want to upgrade your kernel.
-The `Installer` plugin expose a function to install properly a new kernel.
+The `Installer` plugin exposes a function to install properly a new kernel.
 
 ```rust
 # extern crate rock_n_rollup;

@@ -4,7 +4,7 @@ The `Crypto` plugin gives you access to cryptography primitive, like public key 
 
 # New types
 
-It defines the `PublicKey` and the `Signature` type. These types can be constructed from a String:
+It defines the `PublicKey` and the `Signature` types. These types can be constructed from a `String`:
 
 ```rust, noplayground
 # extern crate rock_n_rollup;
@@ -22,7 +22,7 @@ fn my_function() {
 
 # How to use the Crypto plugin
 
-Let's say you have a `transition`. If you want to use the crypto plugin you just have to add the Crypto trait to the Runtime constraint:
+Let's say you have a `transition`. If you want to use the crypto plugin, you just have to add the Crypto trait to the Runtime constraint:
 
 ```rust, noplayground
 # extern crate rock_n_rollup;
