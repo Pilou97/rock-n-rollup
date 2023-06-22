@@ -25,7 +25,7 @@ mod tests {
 
         let mut application = Application::new(&mut runtime);
 
-        let () = main(&mut application);
+        main(&mut application);
 
         assert_eq!(runtime.stdout(), vec!["Hello world\n"]);
     }

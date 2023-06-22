@@ -3,10 +3,11 @@
 members = [
     "rock-n-rollup",
     "kernel-macro",
+    "examples/database",
     "examples/hello-world",
     "examples/read-input",
     "examples/preimage",
     "examples/upgrade-kernel",
-    "examples/everything",
-    "examples/database"
+    "examples/ping-pong",
+    
 ]
