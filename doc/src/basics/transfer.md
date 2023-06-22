@@ -1,7 +1,7 @@
 # Reading custom transfer message
 
-An internal input message can also be a `Transfer` message with a michelson payload.
-Let's say you want to receive some bytes ticket, you can add the follow:
+An internal input message can also be a `Transfer` message with a Michelson payload.
+Let's say you want to receive some bytes ticket:
 
 ```rust, noplayground
 # extern crate rock_n_rollup;

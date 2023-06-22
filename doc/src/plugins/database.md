@@ -1,8 +1,8 @@
 # Database
 
-The `Database` plugin gives you an easier way to read and to write data to the durable state.
+The `Database` plugin gives you an easier way to read and write data to the durable state.
 
-The only thing things you need to use the database is to derive `Serialize` and `Deserialize` on your custom types, and you ready to go.
+You only need to use the database to derive `Serialize` and `Deserialize` on your custom types, and you ready to go.
 
 ```rust
 # extern crate rock_n_rollup;
@@ -17,11 +17,11 @@ fn transition<R: Database<Json>>(rt: &mut R) {
 # fn main(){}
 ```
 
-## Bakends
+## Backends
 
-rock-n-rollup gives you 2 backend to handle the serialization and deserialization of your data:
+Rock-N-Rollup gives you 2 backends to handle the serialization and deserialization of your data:
 
-The json one, useful when you want to access this data directly from the browser:
+The JSON one, useful when you want to access this data directly from the browser:
 
 ```rust
 # extern crate rock_n_rollup;
@@ -53,15 +53,15 @@ fn transition<R: Database<Bincode>>(rt: &mut R) {
 
 ## How to read the data from the browser?
 
-If you want to read the data from the browser, I highly recommend to use the json backend.
+If you want to read the data from the browser, we highly recommend to use the JSON backend.
 
-Then let's say you have saved the data "Hello world" under the path "/state". Then you can query this endpoint:
+Then let's say you have saved the data `"Hello world"` under the path `"/state"`. Then you can query this endpoint:
 
 ```bash
 curl "https://rollup.address/global/block/head/durable/wasm_2_0_0/value?key=/state"
 ```
 
-It should returns you an array of bytes
+It should returns you an array of bytes.
 
-The first 4 bytes represent the size of the data
-The remaining bytes represent the json. Then you can deserialize these bytes into a string, and then you can use `JSON.parse` onto this string.
+The first 4 bytes represent the size of the data.
+The remaining bytes represent the JSON. Then you can deserialize these bytes into a string, and then you can use `JSON.parse` onto this string.

@@ -1,7 +1,7 @@
 # Reading custom external messages
 
 If you want to define your custom external message, it's easy:
-First let's define a message type:
+First let's define a message type `PingPong` as an example:
 
 ```rust, noplayground
 enum PingPong {
@@ -34,7 +34,7 @@ impl FromExternal for PingPong {
 # fn main(){}
 ```
 
-Then you can use the `PingPong` type in your transition
+Then you can use the `PingPong` type in your transition:
 
 ```rust, noplayground
 # extern crate rock_n_rollup;
@@ -63,7 +63,7 @@ fn transition<R: Runtime>(rt: &mut R, ping_pong: External<PingPong>) {
 # fn main(){}
 ```
 
-Your transition will be executed when the payload will be parsed: when there is an external message containing only 0x00 or only 0x01
+Your transition will be executed when the payload will be parsed: when there is an external message containing only `0x00` or only `0x01`.
 
 ```rust, noplayground
 # extern crate rock_n_rollup;

@@ -4,8 +4,8 @@ A simple strategy to upgrade your smart rollup is the "byte ticket strategy".
 
 The idea is simple:
 
-- you split your kernel into chunks
-- you send the root hash to a smart contract
+- split your kernel into chunks
+- send the root hash to a smart contract
 - this smart contract sends a byte ticket representing the root hash to your rollup
 - your rollup proceed to the upgrade
 
@@ -22,13 +22,13 @@ TODO: provide a minimal example:
 Here is the minimal specification of the smart contract:
 
 - one entrypoint that accepts bytes
-- check the signature of the sender (you can also check the authencity of the bytes with a multisig or what you want)
-- mint a byte ticket, the content of the bytes, is the input of the entrypoint
+- check the signature of the sender (you can also check the authencity of the bytes with a multisig or what you prefer)
+- mint a byte ticket, the content of the bytes is the input of the entrypoint
 - send the byte ticket to your rollup address
 
 ## How to install the service
 
-Let's say you have your application, if you want to add the service the only things you have to do is the following:
+Let's say you have your application, if you want to add the service, the only things you have to do is the following:
 
 ```rust
 # extern crate rock_n_rollup;
@@ -44,7 +44,7 @@ fn kernel_entry<R: Runtime>(application: &mut Application<R>) {
 # fn main(){}
 ```
 
-Then when your kernel will receive a root hash from this contract it will proceed to the installation of your new kernel.
+Then when your kernel will receive a root hash from this contract, it will proceed to the installation of your new kernel.
 
 ## Split your kernel
 

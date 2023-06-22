@@ -7,7 +7,7 @@ The `Hasher` plugin gives you access to blake2b hashing algorithm with the follo
 
 ## How to use the Hasher plugin
 
-Let's say you have a `transition`. If you want to use the hasher you just add to add the Hasher trait to the Runtime constraint:
+Let's say you have a `transition`. If you want to use the hasher, you just add to add the Hasher trait to the Runtime constraint:
 
 ```rust
 # extern crate rock_n_rollup;

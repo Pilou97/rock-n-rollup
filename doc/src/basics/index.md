@@ -1,6 +1,6 @@
 # Basics
 
-`rock-n-rollup` uses the same semantic as major libraries of the Rust ecosystem. You can register transitions to the application (as handler for actix, or system for bevy, or route for axum, etc...).
+`rock-n-rollup` uses the same semantic as major libraries of the Rust ecosystem. You can register transitions to the application (as handler for [actix](https://actix.rs/), or system for [bevy,](https://bevyengine.org/) or route for [axum](https://docs.rs/axum/latest/axum/), etc...).
 
 This transition can take any parameters that implement the trait `FromInput`.
 
