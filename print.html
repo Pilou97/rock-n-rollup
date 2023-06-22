@@ -1,0 +1,715 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title></title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="custom.css">
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Rock-n-rollup</a></li><li class="chapter-item expanded "><a href="basics/index.html"><strong aria-hidden="true">2.</strong> Basics</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="basics/getting-started.html"><strong aria-hidden="true">2.1.</strong> Getting start</a></li><li class="chapter-item expanded "><a href="basics/read-inbox.html"><strong aria-hidden="true">2.2.</strong> Read the Inbox</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="basics/external-messages.html"><strong aria-hidden="true">2.2.1.</strong> Custom External messages</a></li><li class="chapter-item expanded "><a href="basics/transfer.html"><strong aria-hidden="true">2.2.2.</strong> Custom Transfer</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="plugins/index.html"><strong aria-hidden="true">3.</strong> Plugins</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="plugins/logger.html"><strong aria-hidden="true">3.1.</strong> Logger</a></li><li class="chapter-item expanded "><a href="plugins/hasher.html"><strong aria-hidden="true">3.2.</strong> Hasher</a></li><li class="chapter-item expanded "><a href="plugins/crypto.html"><strong aria-hidden="true">3.3.</strong> Crypto</a></li><li class="chapter-item expanded "><a href="plugins/database.html"><strong aria-hidden="true">3.4.</strong> Database</a></li><li class="chapter-item expanded "><a href="plugins/dac.html"><strong aria-hidden="true">3.5.</strong> Dac</a></li><li class="chapter-item expanded "><a href="plugins/installer.html"><strong aria-hidden="true">3.6.</strong> Installer</a></li></ol></li><li class="chapter-item expanded "><a href="services/index.html"><strong aria-hidden="true">4.</strong> Services</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="services/ticket-upgrade.html"><strong aria-hidden="true">4.1.</strong> TicketUpgrade</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="rock-n-rollup"><a class="header" href="#rock-n-rollup">Rock-n-rollup</a></h1>
+<p>Wow, you find this framework, that means you are intrigued with this <em>awesome</em> framework.</p>
+<p>Let me introduce this framework for you.</p>
+<p>Rock-n-rollup is an <strong>opiniated</strong> framework to develop <a href="https://tezos.gitlab.io/nairobi/smart_rollups.html">smart rollups</a> on Tezos.
+The goal of this framework is to ease the development of smart rollups for Rust developers. That's why this framework looks like actix/axum/bevy. We decided to use the &quot;dependency injection at runtime pattern&quot;.</p>
+<p>When you develop a webserver, you will develop what you call endpoint or routes, for smart rollup it's the same way but it's named <em>transition</em>.</p>
+<p>In addition, this framework comes with many useful plugins to help you implement your deepest desires.</p>
+<p>Finnaly, this framework also comes with tooling to setup/deploy your rollup.</p>
+<blockquote>
+<p>It can happen we don't share the same opinion. If so, please have a look to this book.
+If you are convinced this framework is not what you are looking for, please use the official Tezos library.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="basics"><a class="header" href="#basics">Basics</a></h1>
+<p><code>rock-n-rollup</code> uses the same semantic as major libraries of the Rust ecosystem. You can register transitions to the application (as handler for <a href="https://actix.rs/">actix</a>, or system for <a href="https://bevyengine.org/">bevy,</a> or route for <a href="https://docs.rs/axum/latest/axum/">axum</a>, etc...).</p>
+<p>This transition can take any parameters that implement the trait <code>FromInput</code>.</p>
+<p>In this section, you will learn and discover how to write custom transitions to fullfill your needs.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installing-rust"><a class="header" href="#installing-rust">Installing Rust</a></h1>
+<p>If you don't have Rust yet, we recommend you use <code>rustup</code> to manage your Rust installation. The official rust guide has a wonderful section on getting started.</p>
+<p>Rock-N-Rollup currently has a minimum supported Rust version of 1.66. Running <code>rustup default 1.66</code> will ensure you have the correct version of Rust. As such, this guide assumes you are running Rust 1.66.</p>
+<p>To develop smart rollups on Tezos, you will also need to compile your Rust code to Wasm. To compile to Wasm just add the <code>wasm32-unknown-unknown</code> as a new target: <code>rustup target add wasm32-unknown-unknown</code>.</p>
+<h1 id="hello-kernel"><a class="header" href="#hello-kernel">Hello kernel!</a></h1>
+<p>Start by creating a new library based Cargo project and changing into the new directory:</p>
+<pre><code class="language-bash">cargo new hello-kernel --lib
+cd hello-kernel
+</code></pre>
+<p>Add a <code>[lib]</code> section to your <code>Cargo.toml</code>:</p>
+<pre><code class="language-toml">[lib]
+crate-type = [&quot;rlib&quot;, &quot;cdylib&quot;]
+</code></pre>
+<p>Add <code>rock-n-rollup</code> as a dependency of your project in <code>Cargo.toml</code> file.</p>
+<pre><code class="language-toml">[dependencies]
+rock-n-rollup = &quot;0.0.5&quot;
+</code></pre>
+<p>Transition functions accept zero or more parameters. These parameters can be extracted from an input (see <code>FromInput</code> trait) and returns void.</p>
+<p>Now let's start the kernel by replace the contents of <code>src/lib.rs</code> with the following:</p>
+<pre><code class="language-rust noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::Runtime;
+
+fn hello&lt;R: Runtime&gt;(rt: &amp;mut R) {
+    rt.write_debug(&quot;Hello kernel!&quot;);
+}
+<span class="boring">fn main(){}</span></code></pre>
+<p>Next, create a <code>kernel_entry</code> function, that accept an <code>Application</code> as parameter. Use <code>application.register</code> to add a transition to your application. Finally, the application is started by calling <code>run</code> on it.</p>
+<pre><code class="language-rust noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::Application;
+use rock_n_rollup::core::Runtime;
+
+fn hello&lt;R: Runtime&gt;(rt: &amp;mut R) {
+    rt.write_debug(&quot;Hello kernel!&quot;);
+}
+
+#[rock_n_rollup::main]
+pub fn kernel_entry&lt;R: Runtime&gt;(application: &amp;mut Application&lt;R&gt;) {
+    application.register(hello).run();
+}
+<span class="boring">fn main(){}</span></code></pre>
+<p>That's it! It should compile with <code>cargo build --release --target wasm32-unknown-unknown</code></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="internal-messages"><a class="header" href="#internal-messages">Internal Messages</a></h1>
+<p>Smart rollups always inject 4 messages in the inbox:</p>
+<ul>
+<li><code>StartOfLevel</code> that indicates the beginning of the inbox.</li>
+<li><code>InfoPerLevel</code> that gives you the current Tezos level of this execution.</li>
+<li><code>EndOfLevel</code> that indicates the end of the inbox.</li>
+<li><code>Transfer</code> that takes a transfer.</li>
+</ul>
+<p>An easy way to execute a transition of this kind of message is to add a parameter to your transition function:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::services::internal::*;
+use rock_n_rollup::core::Runtime;
+
+fn start_of_level&lt;R: Runtime&gt;(rt: &amp;mut R, msg: Internal&lt;StartOfLevel&gt;) {
+    // Only executed on StartOfLevel message
+    // ...
+}
+
+fn info_per_level&lt;R: Runtime&gt;(rt: &amp;mut R, msg: Internal&lt;InfoPerLevel&gt;) {
+    // Only executed on InfoPerLevel message
+    // ...
+}
+
+fn end_of_level&lt;R: Runtime&gt;(rt: &amp;mut R, msg: Internal&lt;EndOfLevel&gt;) {
+    // Only executed on EndOfLevel
+    // ...
+}
+
+fn transfer&lt;R: Runtime&gt;(rt: &amp;mut R, msg: Internal&lt;Transfer&lt;Vec&lt;u8&gt;&gt;&gt;){
+    // Only excuted on Transfer
+    // ...
+}
+<span class="boring">fn main(){}</span></code></pre>
+<h1 id="external-message"><a class="header" href="#external-message">External message</a></h1>
+<p>Message from users can come from the <code>add_rollup_message</code> Tezos operation. This message will be added to the inbox as an external message.</p>
+<p>If you want to trigger a transition on a <code>External</code> message, you can add a parameter to your transition function as follow:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::services::external::*;
+use rock_n_rollup::core::Runtime;
+
+fn transition&lt;R: Runtime&gt;(rt: &amp;mut R, msg: External&lt;Vec&lt;u8&gt;&gt;) {
+    // Only executed on external messages where the payload can be parsed as bytes
+    // External&lt;Vec&lt;u8&gt;&gt; will match on any messages
+    // ...
+}
+<span class="boring">fn main(){}</span></code></pre>
+<p>At this point, you get all the features as the already provided kernel library provided by Tezos code dev.
+You can define transitions on any messages.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="reading-custom-external-messages"><a class="header" href="#reading-custom-external-messages">Reading custom external messages</a></h1>
+<p>If you want to define your custom external message, it's easy:
+First let's define a message type <code>PingPong</code> as an example:</p>
+<pre><code class="language-rust  noplayground">enum PingPong {
+    Ping,
+    Pong
+}
+<span class="boring">fn main(){}</span></code></pre>
+<p>The next step is to implement the <code>FromExternal</code> trait:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::services::external::*;
+<span class="boring">enum PingPong {
+</span><span class="boring">   Ping,
+</span><span class="boring">   Pong
+</span><span class="boring">}
+</span>
+impl FromExternal for PingPong {
+    fn from_external(input: Vec&lt;u8&gt;) -&gt; Result&lt;Self, ()&gt; {
+        // Notice that the magic byte is not there
+        match input.as_slice() {
+            [0x00] =&gt; Ok(PingPong::Ping),
+            [0x01] =&gt; Ok(PingPong::Pong),
+            _ =&gt; Err(())
+        }
+    }
+}
+<span class="boring">fn main(){}</span></code></pre>
+<p>Then you can use the <code>PingPong</code> type in your transition:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::Runtime;
+use rock_n_rollup::services::external::*;
+
+<span class="boring">enum PingPong {
+</span><span class="boring">    Ping,
+</span><span class="boring">    Pong
+</span><span class="boring">}
+</span><span class="boring">
+</span><span class="boring">impl FromExternal for PingPong {
+</span><span class="boring">   fn from_external(input: Vec&lt;u8&gt;) -&gt; Result&lt;Self, ()&gt; {
+</span><span class="boring">       // Notice that the magic byte is not there
+</span><span class="boring">       match input.as_slice() {
+</span><span class="boring">           [0x00] =&gt; Ok(PingPong::Ping),
+</span><span class="boring">           [0x01] =&gt; Ok(PingPong::Pong),
+</span><span class="boring">           _ =&gt; Err(())
+</span><span class="boring">       }
+</span><span class="boring">   }
+</span><span class="boring">}
+</span>
+fn transition&lt;R: Runtime&gt;(rt: &amp;mut R, ping_pong: External&lt;PingPong&gt;) {
+    // process your stuff
+}
+<span class="boring">fn main(){}</span></code></pre>
+<p>Your transition will be executed when the payload will be parsed: when there is an external message containing only <code>0x00</code> or only <code>0x01</code>.</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::{Runtime, Application};
+<span class="boring">use rock_n_rollup::services::external::*;
+</span><span class="boring">
+</span><span class="boring">enum PingPong {
+</span><span class="boring">    Ping,
+</span><span class="boring">    Pong
+</span><span class="boring">}
+</span><span class="boring">
+</span><span class="boring">impl FromExternal for PingPong {
+</span><span class="boring">   fn from_external(input: Vec&lt;u8&gt;) -&gt; Result&lt;Self, ()&gt; {
+</span><span class="boring">       // Notice that the magic byte is not there
+</span><span class="boring">       match input.as_slice() {
+</span><span class="boring">           [0x00] =&gt; Ok(PingPong::Ping),
+</span><span class="boring">           [0x01] =&gt; Ok(PingPong::Pong),
+</span><span class="boring">           _ =&gt; Err(())
+</span><span class="boring">       }
+</span><span class="boring">   }
+</span><span class="boring">}
+</span><span class="boring">
+</span><span class="boring">fn external_transition&lt;R: Runtime&gt;(rt: &amp;mut R, ping_pong: External&lt;PingPong&gt;) {
+</span><span class="boring">   // process your stuff
+</span><span class="boring">}
+</span>
+#[rock_n_rollup::main]
+pub fn kernel_entry&lt;R: Runtime&gt;(application: &amp;mut Application&lt;R&gt;) {
+    application
+        .register(external_transition)
+        .run();
+}
+<span class="boring">fn main(){}</span></code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="reading-custom-transfer-message"><a class="header" href="#reading-custom-transfer-message">Reading custom transfer message</a></h1>
+<p>An internal input message can also be a <code>Transfer</code> message with a Michelson payload.
+Let's say you want to receive some bytes ticket:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::Runtime;
+use rock_n_rollup::services::internal::*;
+use rock_n_rollup::core::michelson::*;
+use rock_n_rollup::core::michelson::ticket::*;
+
+fn transfer&lt;R: Runtime&gt;(rt: &amp;mut R, msg: Internal&lt;Transfer&lt;Ticket&lt;MichelsonBytes&gt;&gt;&gt;) {
+    let transfer = msg.payload();
+    let ticket = transfer.payload();
+    let destination = transfer.destination();
+    let source = transfer.source();
+    let sender = transfer.sender();
+}
+<span class="boring">fn main(){}</span></code></pre>
+<p>Your transition will be executed when the payload is a transfer of byte tickets:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::{Runtime, Application};
+<span class="boring">use rock_n_rollup::services::internal::*;
+</span><span class="boring">use rock_n_rollup::core::michelson::*;
+</span><span class="boring">use rock_n_rollup::core::michelson::ticket::*;
+</span>
+<span class="boring">fn transfer&lt;R: Runtime&gt;(rt: &amp;mut R, msg: Internal&lt;Transfer&lt;Ticket&lt;MichelsonBytes&gt;&gt;&gt;) {
+</span><span class="boring">    let transfer = msg.payload();
+</span><span class="boring">    let ticket = transfer.payload();
+</span><span class="boring">    let destination = transfer.destination();
+</span><span class="boring">    let source = transfer.source();
+</span><span class="boring">    let sender = transfer.sender();
+</span><span class="boring">}
+</span>
+#[rock_n_rollup::main]
+pub fn kernel_entry&lt;R: Runtime&gt;(application: &amp;mut Application&lt;R&gt;) {
+    application
+        .register(transfer)
+        .run();
+}
+<span class="boring">fn main(){}</span></code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="plugins"><a class="header" href="#plugins">Plugins</a></h1>
+<p>Rock-N-Rollup provides many plugins to ease your developement.</p>
+<p>First question, what is a plugin? A plugin is an <strong>augmented</strong> runtime. Basically a plugin is a superset of the runtime.</p>
+<h2 id="how-to-use-plugins"><a class="header" href="#how-to-use-plugins">How to use plugins?</a></h2>
+<p>A plugin is a trait that is implemented for any runtime. So when you want to use the plugin you can add a constraint on the <code>Runtime</code>:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::Runtime;
+use rock_n_rollup::plugins::logger::Logger;
+
+fn transition&lt;R: Runtime + Logger&gt;(rt: &amp;mut R) {
+    rt.log(&quot;Hello kernel&quot;);
+}
+<span class="boring">fn main() {}</span></code></pre>
+<p>If you don't care of the <code>Runtime</code>, you can restrict your function to your plugin and only your plugin:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::logger::Logger;
+
+fn transition&lt;R: Logger&gt;(rt: &amp;mut R) {
+    rt.log(&quot;Hello kernel&quot;);
+}
+<span class="boring">fn main() {}</span></code></pre>
+<p>And of course, you can compose plugins with each other</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::logger::Logger;
+use rock_n_rollup::plugins::hasher::Hasher;
+
+
+fn transition&lt;R: Logger + Hasher&gt;(rt: &amp;mut R) {
+    let data = &quot;Hello world&quot;;
+    rt.info(&quot;Hello world&quot;);
+    let hash = rt.hash(data.as_bytes());
+}
+<span class="boring">fn main() {}</span></code></pre></pre>
+<p>Unfortunately there is one limitation, it's complicated to use two plugins that exposes the same feature.</p>
+<h2 id="how-to-develop-a-plugin"><a class="header" href="#how-to-develop-a-plugin">How to develop a plugin?</a></h2>
+<p>Let's say you want to implement your custom plugin, you can implement it in 3 steps:</p>
+<ol>
+<li>Define a trait</li>
+</ol>
+<p>This trait can define any function.
+Let's implement the <code>Identity</code> plugin: it returns the given parameter.</p>
+<pre><pre class="playground"><code class="language-rust">trait Identity {
+    fn identity&lt;P&gt;(&amp;mut self, param: P) -&gt; P;
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<ol start="2">
+<li>Implement this trait for any <code>Runtime</code></li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::Runtime;
+<span class="boring">trait Identity {
+</span><span class="boring">   fn identity&lt;P&gt;(&amp;mut self, param: P) -&gt; P;
+</span><span class="boring">}
+</span>
+impl &lt;R&gt; Identity for R
+where
+    R: Runtime
+{
+    fn identity&lt;P&gt;(&amp;mut self, param: P) -&gt; P {
+        param
+    }
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<p>Tips, you can also compose plugins</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::Runtime;
+use rock_n_rollup::plugins::logger::Logger;
+<span class="boring">trait Identity {
+</span><span class="boring">   fn identity&lt;P&gt;(&amp;mut self, param: P) -&gt; P;
+</span><span class="boring">}
+</span>
+impl &lt;R&gt; Identity for R
+where
+    R: Runtime + Logger
+{
+    fn identity&lt;P&gt;(&amp;mut self, param: P) -&gt; P {
+        self.log(&quot;Hello identity plugin&quot;);
+        param
+    }
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<ol start="3">
+<li>Let's write some tests</li>
+</ol>
+<p>Because you have implemented your trait for all <code>Runtime</code>, you can directly use the <code>MockRuntime</code> to test your plugin.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span><span class="boring">use rock_n_rollup::core::Runtime;
+</span><span class="boring">use rock_n_rollup::plugins::logger::Logger;
+</span><span class="boring">trait Identity {
+</span><span class="boring">   fn identity&lt;P&gt;(&amp;mut self, param: P) -&gt; P;
+</span><span class="boring">}
+</span><span class="boring">impl &lt;R&gt; Identity for R
+</span><span class="boring">where
+</span><span class="boring">   R: Runtime + Logger
+</span><span class="boring">{
+</span><span class="boring">   fn identity&lt;P&gt;(&amp;mut self, param: P) -&gt; P {
+</span><span class="boring">       self.log(&quot;Hello identity plugin&quot;);
+</span><span class="boring">       param
+</span><span class="boring">   }
+</span><span class="boring">}
+</span>use rock_n_rollup::core::MockRuntime;
+
+fn test() {
+    let mut runtime = MockRuntime::default();
+    let param = runtime.identity(32);
+    assert_eq!(param, 32)
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="logger"><a class="header" href="#logger">Logger</a></h1>
+<p>The <code>Logger</code> plugin is a simple plugin. It adds to the runtime 5 functions:</p>
+<ul>
+<li><code>log</code> to print normal log</li>
+<li><code>info</code> to print log with info level</li>
+<li><code>warn</code> to print log with warn level</li>
+<li><code>err</code> to print log with error level</li>
+</ul>
+<h2 id="how-to-use-the-logger-plugin"><a class="header" href="#how-to-use-the-logger-plugin">How to use the Logger plugin</a></h2>
+<p>Let's say you have a <code>transition</code>. If you want to use the logger, you just add to add the Logger trait to the Runtime constraint:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::logger::Logger;
+
+fn transition&lt;R: Logger&gt;(rt: &amp;mut R) {
+    rt.log(&quot;Normal log with \n at the end&quot;);
+    rt.info(&quot;The log will start by [INFO]&quot;);
+    rt.warn(&quot;The log will start by [WARN]&quot;);
+    rt.err(&quot;The log will start by [ERR]&quot;);
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hasher"><a class="header" href="#hasher">Hasher</a></h1>
+<p>The <code>Hasher</code> plugin gives you access to blake2b hashing algorithm with the following function:</p>
+<ul>
+<li><code>hash</code> to hash any data with Blake2b 256 bits</li>
+<li><code>hash_512</code> to hash any data with Blake2b 512 bits</li>
+</ul>
+<h2 id="how-to-use-the-hasher-plugin"><a class="header" href="#how-to-use-the-hasher-plugin">How to use the Hasher plugin</a></h2>
+<p>Let's say you have a <code>transition</code>. If you want to use the hasher, you just add to add the Hasher trait to the Runtime constraint:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::hasher::Hasher;
+
+fn transition&lt;R: Hasher&gt;(rt: &amp;mut R) {
+    let data = b&quot;Hello world&quot;;
+    let hash = rt.hash(data);
+    let string: String = hash.to_string();
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cryptography"><a class="header" href="#cryptography">Cryptography</a></h1>
+<p>The <code>Crypto</code> plugin gives you access to cryptography primitive, like public key and signature verification.</p>
+<h1 id="new-types"><a class="header" href="#new-types">New types</a></h1>
+<p>It defines the <code>PublicKey</code> and the <code>Signature</code> types. These types can be constructed from a <code>String</code>:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::crypto::*;
+
+fn my_function() {
+    let pkey = &quot;edpkuDMUm7Y53wp4gxeLBXuiAhXZrLn8XB1R83ksvvesH8Lp8bmCfK&quot;.to_string();
+    let pkey = PublicKey::try_from(pkey).unwrap();
+
+    let signature = &quot;edsigtuU5nUqBniorqTFXFixkG6ZkfvEPrfc9aT9DnMAeims2AX2yjpgYaedXBoKzAGHE3ZXSi1hZz6piZ3itTE7f2F4FoaxXtM&quot;.to_string();
+    let signature = Signature::try_from(signature).unwrap();
+}
+<span class="boring">fn main(){}</span></code></pre>
+<h1 id="how-to-use-the-crypto-plugin"><a class="header" href="#how-to-use-the-crypto-plugin">How to use the Crypto plugin</a></h1>
+<p>Let's say you have a <code>transition</code>. If you want to use the crypto plugin, you just have to add the Crypto trait to the Runtime constraint:</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::crypto::*;
+
+fn transition&lt;R: Verifier&gt;(rt: &amp;mut R) {
+    let pkey = &quot;edpkuDMUm7Y53wp4gxeLBXuiAhXZrLn8XB1R83ksvvesH8Lp8bmCfK&quot;.to_string();
+    let pkey = PublicKey::try_from(pkey).unwrap();
+
+    let signature = &quot;edsigtuU5nUqBniorqTFXFixkG6ZkfvEPrfc9aT9DnMAeims2AX2yjpgYaedXBoKzAGHE3ZXSi1hZz6piZ3itTE7f2F4FoaxXtM&quot;.to_string();
+    let signature = Signature::try_from(signature).unwrap();
+
+    let data = b&quot;hello world&quot;;
+    // verifies the signature
+    let is_correct: bool = rt.verify_signature(&amp;signature, &amp;pkey, data);
+}
+<span class="boring">fn main(){}</span></code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="database"><a class="header" href="#database">Database</a></h1>
+<p>The <code>Database</code> plugin gives you an easier way to read and write data to the durable state.</p>
+<p>You only need to use the database to derive <code>Serialize</code> and <code>Deserialize</code> on your custom types, and you ready to go.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::database::{Database, Json};
+
+fn transition&lt;R: Database&lt;Json&gt;&gt;(rt: &amp;mut R) {
+    let greetings = &quot;Hello world!&quot;.to_string();
+
+    let _ = rt.save(&quot;/greet&quot;, &amp;greetings);
+    let greetings = rt.get::&lt;String&gt;(&quot;/greet&quot;);
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<h2 id="backends"><a class="header" href="#backends">Backends</a></h2>
+<p>Rock-N-Rollup gives you 2 backends to handle the serialization and deserialization of your data:</p>
+<p>The JSON one, useful when you want to access this data directly from the browser:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::database::{Database, Json};
+
+fn transition&lt;R: Database&lt;Json&gt;&gt;(rt: &amp;mut R) {
+    let greetings = &quot;Hello world!&quot;.to_string();
+
+    let _ = rt.save(&quot;/greet&quot;, &amp;greetings);
+    let greetings = rt.get::&lt;String&gt;(&quot;/greet&quot;);
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<p>The bincode one, which is faster and consume less ticks:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::database::{Database, Bincode};
+
+fn transition&lt;R: Database&lt;Bincode&gt;&gt;(rt: &amp;mut R) {
+    let greetings = &quot;Hello world!&quot;.to_string();
+
+    let _ = rt.save(&quot;/greet&quot;, &amp;greetings);
+    let greetings = rt.get::&lt;String&gt;(&quot;/greet&quot;);
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<h2 id="how-to-read-the-data-from-the-browser"><a class="header" href="#how-to-read-the-data-from-the-browser">How to read the data from the browser?</a></h2>
+<p>If you want to read the data from the browser, we highly recommend to use the JSON backend.</p>
+<p>Then let's say you have saved the data <code>&quot;Hello world&quot;</code> under the path <code>&quot;/state&quot;</code>. Then you can query this endpoint:</p>
+<pre><code class="language-bash">curl &quot;https://rollup.address/global/block/head/durable/wasm_2_0_0/value?key=/state&quot;
+</code></pre>
+<p>It should returns you an array of bytes.</p>
+<p>The first 4 bytes represent the size of the data.
+The remaining bytes represent the JSON. Then you can deserialize these bytes into a string, and then you can use <code>JSON.parse</code> onto this string.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="dac"><a class="header" href="#dac">Dac</a></h1>
+<p>The <code>Dac</code> plugin gives you a way to read data from the reveal data channel (populated by the DAC).</p>
+<pre><code class="language-rust  noplayground"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::dac::*;
+
+fn transition&lt;R: Dac&gt;(rt: &amp;mut R) {
+    let hash: PreimageHash = PreimageHash::try_from(&quot;00D49798B2E23FF9F48680793A649FE7B787DB5C5649ACF8FC1C950CDA12E3AC82&quot;).unwrap();
+
+    let data: Vec&lt;u8&gt; = rt.read_from_dac(&amp;hash).unwrap();
+}
+<span class="boring">fn main() {}</span></code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installer"><a class="header" href="#installer">Installer</a></h1>
+<p>You may want to upgrade your kernel.
+The <code>Installer</code> plugin exposes a function to install properly a new kernel.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::plugins::installer::*;
+
+fn transition&lt;R: Installer&gt;(rt: &amp;mut R) {
+    let kernel: Vec&lt;u8&gt; = Vec::default(); // let's say you have some bytes
+    let result: Result&lt;(), ()&gt; = rt.install(&amp;kernel);
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="services"><a class="header" href="#services">Services</a></h1>
+<p>A service is a set of transition.</p>
+<p>User can define their own services or use some services provided by the library.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ticketupgrade"><a class="header" href="#ticketupgrade">TicketUpgrade</a></h1>
+<p>A simple strategy to upgrade your smart rollup is the &quot;byte ticket strategy&quot;.</p>
+<p>The idea is simple:</p>
+<ul>
+<li>split your kernel into chunks</li>
+<li>send the root hash to a smart contract</li>
+<li>this smart contract sends a byte ticket representing the root hash to your rollup</li>
+<li>your rollup proceed to the upgrade</li>
+</ul>
+<h2 id="requirement"><a class="header" href="#requirement">Requirement</a></h2>
+<ul>
+<li>Your rollup should have the type <code>byte ticket</code></li>
+<li>Your rollup should be deployed with the <code>TicketUpgrade</code> service</li>
+<li>Deploying a smart contract on L1 that acts as a proxy</li>
+</ul>
+<h2 id="deploy-a-smart-contract"><a class="header" href="#deploy-a-smart-contract">Deploy a smart contract</a></h2>
+<p>TODO: provide a minimal example:</p>
+<p>Here is the minimal specification of the smart contract:</p>
+<ul>
+<li>one entrypoint that accepts bytes</li>
+<li>check the signature of the sender (you can also check the authencity of the bytes with a multisig or what you prefer)</li>
+<li>mint a byte ticket, the content of the bytes is the input of the entrypoint</li>
+<li>send the byte ticket to your rollup address</li>
+</ul>
+<h2 id="how-to-install-the-service"><a class="header" href="#how-to-install-the-service">How to install the service</a></h2>
+<p>Let's say you have your application, if you want to add the service, the only things you have to do is the following:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">extern crate rock_n_rollup;
+</span>use rock_n_rollup::core::{Runtime, Application};
+use rock_n_rollup::services::ticket_upgrade::TicketUpgrade;
+
+#[rock_n_rollup::main]
+fn kernel_entry&lt;R: Runtime&gt;(application: &amp;mut Application&lt;R&gt;) {
+    application
+        .service(TicketUpgrade::new(&quot;KT1...&quot;)) // Put the address of your L1 contract
+        .run()
+}
+<span class="boring">fn main(){}</span></code></pre></pre>
+<p>Then when your kernel will receive a root hash from this contract, it will proceed to the installation of your new kernel.</p>
+<h2 id="split-your-kernel"><a class="header" href="#split-your-kernel">Split your kernel</a></h2>
+<p>As you did to originate your kernel, you will have to split your new kernel with the <a href="https://crates.io/crates/tezos-smart-rollup-installer">tezos-smart-rollup-installer</a>.</p>
+<pre><code class="language-bash">$ smart-rollup-installer get-reveal-installer --upgrade-to my_kernel.wasm --output installer.hex --preimages-dir wasm_2_0_0
+</code></pre>
+<p>Place the generated chunks in the good folder.</p>
+<p>Then you need to retrieve the root hash:</p>
+<pre><code class="language-bash">$ cat installer.hex | tail -c 33
+</code></pre>
+<p>You can send the resulting output directly to your smart contract and your kernel will be upgraded!!</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
