@@ -13,6 +13,10 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
     let output = quote! {
         #[export_name = "kernel_run"]
         pub extern "C" fn kernel_run() {
+            /// Maybe you can see the implementation of
+            /// https://gitlab.com/tezos/tezos/-/blob/master/src/kernel_sdk/entrypoint/src/lib.rs
+            /// Create a new RollupHost
+            /// And give it to the KernelRuntime::new(rollup_host)
             let mut runtime = rock_n_rollup::core::KernelRuntime::default();
             let mut app = rock_n_rollup::core::Application::new(&mut runtime);
             #fn_name(&mut app);

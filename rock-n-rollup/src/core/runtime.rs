@@ -106,11 +106,20 @@ pub trait Runtime: 'static {
 #[derive(Default)]
 pub struct KernelRuntime {}
 
+/// First: rename Runtime into CustomRuntime
+/// Second step:
+/// KernelRuntime<'a, Rt: impl Runtime> { // The one from tezos-smart-rollup
+///    runtime: &'a, mut Rt
+/// }
+/// Third step:
+/// Adapt the following implementation: impl CustomRuntime for KernelRuntime
+///
+/// Last step: remove code starting line 21
+
 impl Runtime for KernelRuntime {
     fn write_debug(&mut self, msg: &str) {
-        unsafe {
-            write_debug(msg.as_ptr(), msg.len());
-        }
+        // self.runtime.write_debug(msg);
+        // Ok(())
     }
 
     fn next_input(&mut self) -> Option<RawInput> {
