@@ -1,4 +1,6 @@
-use std::{collections::HashMap, println};
+use std::collections::HashMap;
+
+use tezos_smart_rollup_host::runtime::Runtime;
 
 use super::constants::PREIMAGE_HASH_SIZE;
 
@@ -39,7 +41,7 @@ extern "C" {
     pub fn store_delete(path: *const u8, path_len: usize) -> i32;
 
     /// Returns the number of bytes written to the durable storage
-    /// (should be equal to `num_bytes`, or an error code.
+    /// (should be equal to `num_bytes`, or an error code).
     pub fn store_read(
         path: *const u8,
         path_len: usize,
@@ -74,7 +76,7 @@ extern "C" {
     ) -> i32;
 }
 
-pub trait Runtime: 'static {
+pub trait CustomRuntime {
     /// Print a message in the rollup stdout (if activated)
     fn write_debug(&mut self, msg: &str);
 
@@ -104,22 +106,68 @@ pub trait Runtime: 'static {
 }
 
 #[derive(Default)]
-pub struct KernelRuntime {}
+pub struct KernelRuntime<R>
+where
+    R: Runtime,
+{
+    host: R,
+}
 
-/// First: rename Runtime into CustomRuntime
-/// Second step:
-/// KernelRuntime<'a, Rt: impl Runtime> { // The one from tezos-smart-rollup
-///    runtime: &'a, mut Rt
-/// }
-/// Third step:
-/// Adapt the following implementation: impl CustomRuntime for KernelRuntime
-///
-/// Last step: remove code starting line 21
+impl<R> KernelRuntime<R>
+where
+    R: Runtime,
+{
+    pub fn new(host: R) -> Self {
+        Self { host }
+    }
+}
 
-impl Runtime for KernelRuntime {
+impl<R> CustomRuntime for KernelRuntime<R>
+where
+    R: Runtime,
+{
     fn write_debug(&mut self, msg: &str) {
-        // self.runtime.write_debug(msg);
-        // Ok(())
+        self.host.write_debug(msg)
+    }
+
+    fn store_delete(&mut self, path: &str) -> Result<(), ()> {
+        self.host.store_delete(path)
+    }
+
+    fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>> {
+        self.host.store_read(path, offset, size)
+    }
+
+    fn store_write(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
+        self.host.store_write(path, data, at_offset)
+    }
+
+    fn store_move(&mut self, from: &str, to: &str) -> Result<(), ()> {
+        self.host.store_move(from, to)
+    }
+
+    //TODO
+    fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
+        // buffer is the payload
+        // self.host.reveal_preimage(hash, destination)
+        let max_size = 4096;
+        let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE as usize);
+
+        let u8_size = u8::try_from(PREIMAGE_HASH_SIZE).unwrap();
+
+        self.host.reveal_preimage(hash)
+    }
+
+    fn store_is_present(&mut self, path: &str) -> bool {
+        let ptr = path.as_ptr();
+        let res = unsafe { store_has(ptr, path.len()) };
+        match res {
+            0 => false, // No file
+            1 => true,  // Only file
+            2 => true,  // Only directory
+            3 => true,  // Directory + File
+            _ => false,
+        }
     }
 
     fn next_input(&mut self) -> Option<RawInput> {
@@ -141,87 +189,21 @@ impl Runtime for KernelRuntime {
             })
         }
     }
-
-    fn store_is_present(&mut self, path: &str) -> bool {
-        let ptr = path.as_ptr();
-        let res = unsafe { store_has(ptr, path.len()) };
-        match res {
-            0 => false, // No file
-            1 => true,  // Only file
-            2 => true,  // Only directory
-            3 => true,  // Directory + File
-            _ => false,
-        }
-    }
-
-    fn store_delete(&mut self, path: &str) -> Result<(), ()> {
-        let ptr = path.as_ptr();
-        let res = unsafe { store_delete(ptr, path.len()) };
-        match res {
-            0 => Ok(()),
-            _ => Err(()),
-        }
-    }
-
-    fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>> {
-        if !self.store_is_present(path) {
-            return None;
-        }
-
-        let ptr = path.as_ptr();
-        let path_len = path.len();
-        let mut buffer = Vec::with_capacity(size);
-        let dst = buffer.as_mut_ptr();
-        unsafe {
-            let _ = store_read(ptr, path_len, offset, dst, size);
-            buffer.set_len(size);
-        }
-
-        Some(buffer)
-    }
-
-    fn store_write(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
-        let res = unsafe {
-            let path_len = path.len();
-            let path = path.as_ptr();
-            let num_bytes = data.len();
-            let src = data.as_ptr();
-            store_write(path, path_len, at_offset, src, num_bytes)
-        };
-        match res {
-            0 => Ok(()),
-            err => {
-                self.write_debug(&format!("error store_write_raw: {}\n", err));
-                Err(())
-            }
-        }
-    }
-    fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
-        let max_size = 4096;
-        let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE as usize);
-
-        let u8_size = u8::try_from(PREIMAGE_HASH_SIZE).unwrap();
-
-        unsafe {
-            let size = reveal_preimage(hash.as_ptr(), u8_size, payload.as_mut_ptr(), max_size);
-            if size < 0 {
-                Err(())
-            } else {
-                let size = usize::try_from(size).unwrap();
-                payload.set_len(size);
-                Ok(payload)
-            }
-        }
-    }
-
-    fn store_move(&mut self, from: &str, to: &str) -> Result<(), ()> {
-        let res = unsafe { store_move(from.as_ptr(), from.len(), to.as_ptr(), to.len()) };
-        match res {
-            0 => Ok(()),
-            _ => Err(()),
-        }
-    }
 }
+
+/* Q: modify
+#[derive(Default)]
+pub struct KernelRuntime {}*/
+
+/// First: rename Runtime into CustomRuntime
+/// Second step:
+/// KernelRuntime<'a, Rt: impl Runtime> { // The one from tezos-smart-rollup
+///    runtime: &'a, mut Rt
+/// }
+/// Third step:
+/// Adapt the following implementation: impl CustomRuntime for KernelRuntime
+///
+/// Last step: remove code starting line 21
 
 pub struct MockRuntime {
     stdout: Vec<String>,
@@ -260,7 +242,7 @@ impl MockRuntime {
     }
 }
 
-impl Runtime for MockRuntime {
+impl CustomRuntime for MockRuntime {
     fn write_debug(&mut self, msg: &str) {
         self.stdout.push(msg.to_string());
     }

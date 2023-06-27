@@ -843,6 +843,7 @@ dependencies = [
  "sha2 0.10.7",
  "skeptic",
  "tezos-smart-rollup-encoding",
+ "tezos-smart-rollup-host",
  "tezos_data_encoding",
 ]
 
@@ -1093,6 +1094,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25ef490a027929034fda6e56d185d89ef70149c5818d5fa7a03f348d6ba985a1"
 dependencies = [
  "tezos-smart-rollup-core",
+ "tezos_crypto_rs",
+ "tezos_data_encoding",
+ "thiserror",
 ]
 
 [[package]]
