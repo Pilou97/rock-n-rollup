@@ -57,7 +57,7 @@ fn upgrade_on_ticket<R: Logger + Dac + Installer>(
 
 impl<R> IntoService<R, Vec<u8>, TicketUpgrade> for TicketUpgrade
 where
-    R: CustomRuntime,
+    R: CustomRuntime + 'static,
 {
     fn into_service(self) -> Service<R, Vec<u8>, Self> {
         let mut service = Service::<R, Vec<u8>, Self>::new(self);

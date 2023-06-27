@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use tezos_smart_rollup_host::runtime::Runtime;
+use tezos_smart_rollup_host::{path::RefPath, runtime::Runtime};
 
 use super::constants::PREIMAGE_HASH_SIZE;
 
@@ -131,31 +131,53 @@ where
     }
 
     fn store_delete(&mut self, path: &str) -> Result<(), ()> {
-        self.host.store_delete(path)
+        let path = RefPath::assert_from(path.as_bytes());
+
+        let res = self.host.store_delete(&path);
+        match res {
+            Ok(_) => Ok(()),
+            Err(_) => Err(print!("Error store_delete")),
+        }
     }
 
     fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>> {
-        self.host.store_read(path, offset, size)
+        let path = RefPath::assert_from(path.as_bytes());
+
+        let res = self.host.store_read(&path, offset, size);
+        match res {
+            Ok(t) => Some(t),
+            Err(_) => None,
+        }
     }
 
     fn store_write(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
-        self.host.store_write(path, data, at_offset)
+        let path = RefPath::assert_from(path.as_bytes());
+        let res = self.host.store_write(&path, data, at_offset);
+        match res {
+            Ok(_) => Ok(()),
+            Err(_) => Err(print!("Error store_write")),
+        }
     }
 
     fn store_move(&mut self, from: &str, to: &str) -> Result<(), ()> {
-        self.host.store_move(from, to)
+        let from = RefPath::assert_from(from.as_bytes());
+        let to = RefPath::assert_from(to.as_bytes());
+
+        let res = self.host.store_move(&from, &to);
+        match res {
+            Ok(_) => Ok(()),
+            Err(_) => Err(print!("Error store_move")),
+        }
     }
 
-    //TODO
     fn reveal_preimage(&mut self, hash: &[u8; PREIMAGE_HASH_SIZE]) -> Result<Vec<u8>, ()> {
-        // buffer is the payload
-        // self.host.reveal_preimage(hash, destination)
-        let max_size = 4096;
-        let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE as usize);
-
-        let u8_size = u8::try_from(PREIMAGE_HASH_SIZE).unwrap();
-
-        self.host.reveal_preimage(hash)
+        let payload: Vec<u8> = Vec::with_capacity(MAX_MESSAGE_SIZE);
+        let mut payload: Vec<u8> = payload.to_vec();
+        let res: Result<usize, _> = self.host.reveal_preimage(hash, &mut payload);
+        match res {
+            Ok(bytes) => Ok(bytes.to_le_bytes().to_vec()),
+            Err(_) => Err(print!("Error reveal_preimage")),
+        }
     }
 
     fn store_is_present(&mut self, path: &str) -> bool {
@@ -171,7 +193,7 @@ where
     }
 
     fn next_input(&mut self) -> Option<RawInput> {
-        let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE as usize);
+        let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE);
 
         // Placeholder values
         let mut message_info = ReadInputMessageInfo { level: 0, id: 0 };
