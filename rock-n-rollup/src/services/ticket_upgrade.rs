@@ -1,12 +1,14 @@
 use crate::{
-    core::{FromInput, Input, IntoService, Runtime, Service},
+    core::{CustomRuntime, FromInput, Input, IntoService, Service},
     plugins::{
         dac::{Dac, PreimageHash},
         installer::Installer,
         logger::Logger,
     },
 };
+
 use tezos_smart_rollup_encoding::michelson::{ticket::Ticket, MichelsonBytes};
+//use tezos_smart_rollup_host::runtime::Runtime;
 
 use super::internal::{Internal, Transfer};
 
@@ -24,7 +26,7 @@ impl TicketUpgrade {
 }
 
 impl FromInput<Vec<u8>, TicketUpgrade> for TicketUpgrade {
-    fn from_input<R: Runtime>(
+    fn from_input<R: CustomRuntime>(
         _: &mut R,
         _: &Input<Vec<u8>>,
         state: &TicketUpgrade,
@@ -55,7 +57,7 @@ fn upgrade_on_ticket<R: Logger + Dac + Installer>(
 
 impl<R> IntoService<R, Vec<u8>, TicketUpgrade> for TicketUpgrade
 where
-    R: Runtime,
+    R: CustomRuntime,
 {
     fn into_service(self) -> Service<R, Vec<u8>, Self> {
         let mut service = Service::<R, Vec<u8>, Self>::new(self);

@@ -2,7 +2,9 @@ use std::mem::size_of;
 
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::core::Runtime;
+use crate::core::CustomRuntime;
+
+//use tezos_smart_rollup_host::runtime::Runtime;
 
 pub trait Backend {
     fn to_bytes<P>(data: &P) -> Result<Vec<u8>, ()>
@@ -73,7 +75,7 @@ where
 
 impl<R, B> Database<B> for R
 where
-    R: Runtime,
+    R: CustomRuntime,
     B: Backend,
 {
     fn get<D>(&mut self, path: &str) -> Result<Option<D>, ()>

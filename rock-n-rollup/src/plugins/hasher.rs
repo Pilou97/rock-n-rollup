@@ -1,7 +1,9 @@
 use blake2::digest::{Update, VariableOutput};
 use blake2::Blake2bVar;
 
-use crate::core::Runtime;
+use crate::core::CustomRuntime;
+
+//use tezos_smart_rollup_host::runtime::Runtime;
 
 #[derive(PartialEq, Eq, Debug)]
 pub struct Blake2b512([u8; 64]);
@@ -47,7 +49,7 @@ impl AsRef<[u8]> for Blake2b256 {
 
 impl<R> Hasher for R
 where
-    R: Runtime,
+    R: CustomRuntime,
 {
     fn hash(&mut self, data: &[u8]) -> Blake2b256 {
         let mut hasher = Blake2bVar::new(32).unwrap();

@@ -1,4 +1,5 @@
-use super::{RawInput, Runtime};
+use super::{CustomRuntime, RawInput};
+//use tezos_smart_rollup_host::runtime::Runtime;
 
 #[derive(Clone)]
 pub struct Input<P> {
@@ -11,7 +12,11 @@ pub trait FromInput<P, S>
 where
     Self: Sized,
 {
-    fn from_input<R: Runtime>(runtime: &mut R, input: &Input<P>, state: &S) -> Result<Self, ()>;
+    fn from_input<R: CustomRuntime>(
+        runtime: &mut R,
+        input: &Input<P>,
+        state: &S,
+    ) -> Result<Self, ()>;
 }
 
 ////////// some types
@@ -21,7 +26,7 @@ type GuardFct<R, P> = dyn FnMut(&mut R, &Input<P>) -> bool;
 
 pub trait IntoTransition<R, P, S, T>
 where
-    R: Runtime,
+    R: CustomRuntime,
 {
     fn into_transition(self) -> Box<TransitionFct<R, P, S>>;
 }
@@ -39,7 +44,7 @@ macro_rules! tuple_from_req {
             $($generic_param: FromInput<P, S>),*,
             P: Clone,
         {
-            fn from_input<R: Runtime>(runtime: &mut R, input: &Input<P>, state: &S) -> Result<Self, ()> {
+            fn from_input<R: CustomRuntime>(runtime: &mut R, input: &Input<P>, state: &S) -> Result<Self, ()> {
                 $(
                     #[allow(non_snake_case)]
                     let $generic_param = match <$generic_param>::from_input(runtime, input, state) {
@@ -54,7 +59,7 @@ macro_rules! tuple_from_req {
 
         impl<R, P, Fct, S, $($generic_param),*> IntoTransition<R, P, S, $struct_name<$($generic_param),*>> for Fct
             where
-                R: Runtime,
+                R: CustomRuntime,
                 Fct: Fn(&mut R, $($generic_param),*) + 'static,
                 $($generic_param: FromInput<P, S>),*,
                 P: Clone,
@@ -75,7 +80,7 @@ macro_rules! tuple_from_req {
 
 impl<R, P, F, S> IntoTransition<R, P, S, ()> for F
 where
-    R: Runtime,
+    R: CustomRuntime,
     F: Fn(&mut R) + 'static,
 {
     fn into_transition(self) -> Box<dyn FnMut(&mut R, &Input<P>, &S) -> Result<(), ()>> {
@@ -102,11 +107,11 @@ pub trait FromRawInput
 where
     Self: Sized,
 {
-    fn from_raw_input<R: Runtime>(runtime: &mut R, input: &RawInput) -> Result<Self, ()>;
+    fn from_raw_input<R: CustomRuntime>(runtime: &mut R, input: &RawInput) -> Result<Self, ()>;
 }
 
 impl<S> FromInput<Vec<u8>, S> for () {
-    fn from_input<R: Runtime>(_: &mut R, _: &Input<Vec<u8>>, _: &S) -> Result<Self, ()> {
+    fn from_input<R: CustomRuntime>(_: &mut R, _: &Input<Vec<u8>>, _: &S) -> Result<Self, ()> {
         Ok(())
     }
 }
@@ -115,7 +120,7 @@ impl<P, S> FromInput<P, S> for Input<P>
 where
     P: Clone,
 {
-    fn from_input<R: Runtime>(_: &mut R, input: &Input<P>, _: &S) -> Result<Self, ()> {
+    fn from_input<R: CustomRuntime>(_: &mut R, input: &Input<P>, _: &S) -> Result<Self, ()> {
         Ok(input.clone())
     }
 }
@@ -124,19 +129,19 @@ impl<P, S> FromInput<P, S> for P
 where
     P: Clone,
 {
-    fn from_input<R: Runtime>(_: &mut R, input: &Input<P>, _: &S) -> Result<Self, ()> {
+    fn from_input<R: CustomRuntime>(_: &mut R, input: &Input<P>, _: &S) -> Result<Self, ()> {
         Ok(input.payload.clone())
     }
 }
 
 impl FromRawInput for Vec<u8> {
-    fn from_raw_input<R: Runtime>(_: &mut R, input: &RawInput) -> Result<Self, ()> {
+    fn from_raw_input<R: CustomRuntime>(_: &mut R, input: &RawInput) -> Result<Self, ()> {
         Ok(input.payload.clone())
     }
 }
 
 impl FromRawInput for () {
-    fn from_raw_input<R: Runtime>(_: &mut R, _: &RawInput) -> Result<Self, ()> {
+    fn from_raw_input<R: CustomRuntime>(_: &mut R, _: &RawInput) -> Result<Self, ()> {
         Ok(())
     }
 }
@@ -167,14 +172,14 @@ where
 
 pub trait Runnable<R>
 where
-    R: Runtime,
+    R: CustomRuntime,
 {
     fn run(&mut self, runtime: &mut R, input: RawInput);
 }
 
 impl<R, P, S> Runnable<R> for Service<R, P, S>
 where
-    R: Runtime,
+    R: CustomRuntime,
     P: FromRawInput,
 {
     fn run(&mut self, runtime: &mut R, input: RawInput) {
@@ -220,7 +225,7 @@ where
 
 impl<R, P, S> Service<R, P, S>
 where
-    R: Runtime + 'static,
+    R: CustomRuntime + 'static,
     P: FromRawInput + 'static,
 {
     /// Add a guard to the service
@@ -251,7 +256,7 @@ where
 
 pub trait IntoService<R, P, S>
 where
-    R: Runtime,
+    R: CustomRuntime,
     P: FromRawInput,
 {
     fn into_service(self) -> Service<R, P, S>;
@@ -259,7 +264,7 @@ where
 
 impl<R, P, S> IntoService<R, P, S> for Service<R, P, S>
 where
-    R: Runtime,
+    R: CustomRuntime,
     P: FromRawInput,
 {
     fn into_service(self) -> Service<R, P, S> {
@@ -269,7 +274,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::core::{runtime::MockRuntime, Application, Runtime};
+    use crate::core::{runtime::MockRuntime, Application, CustomRuntime};
+    //use tezos_smart_rollup_host::runtime::Runtime;
 
     use super::{FromInput, IntoService, Service};
 
@@ -278,7 +284,7 @@ mod tests {
     }
 
     impl FromInput<Vec<u8>, String> for Test {
-        fn from_input<R: Runtime>(
+        fn from_input<R: CustomRuntime>(
             _: &mut R,
             _: &super::Input<Vec<u8>>,
             state: &String,
@@ -289,39 +295,39 @@ mod tests {
         }
     }
 
-    fn transition_0<R: Runtime>(rt: &mut R) {
+    fn transition_0<R: CustomRuntime>(rt: &mut R) {
         rt.write_debug("Hello world 0");
     }
 
-    fn transition_1<R: Runtime>(rt: &mut R, t: Test) {
+    fn transition_1<R: CustomRuntime>(rt: &mut R, t: Test) {
         rt.write_debug(&t.inner);
     }
 
-    fn transition_2<R: Runtime>(rt: &mut R, _: (), _: ()) {
+    fn transition_2<R: CustomRuntime>(rt: &mut R, _: (), _: ()) {
         rt.write_debug("Hello world 2");
     }
 
-    fn transition_3<R: Runtime>(rt: &mut R, _: (), _: (), _: ()) {
+    fn transition_3<R: CustomRuntime>(rt: &mut R, _: (), _: (), _: ()) {
         rt.write_debug("Hello world 3");
     }
 
-    fn transition_4<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: ()) {
+    fn transition_4<R: CustomRuntime>(rt: &mut R, _: (), _: (), _: (), _: ()) {
         rt.write_debug("Hello world 4");
     }
 
-    fn transition_5<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: (), _: ()) {
+    fn transition_5<R: CustomRuntime>(rt: &mut R, _: (), _: (), _: (), _: (), _: ()) {
         rt.write_debug("Hello world 5");
     }
 
-    fn transition_6<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: (), _: (), _: ()) {
+    fn transition_6<R: CustomRuntime>(rt: &mut R, _: (), _: (), _: (), _: (), _: (), _: ()) {
         rt.write_debug("Hello world 6");
     }
 
-    fn transition_7<R: Runtime>(rt: &mut R, _: (), _: (), _: (), _: (), _: (), _: (), _: ()) {
+    fn transition_7<R: CustomRuntime>(rt: &mut R, _: (), _: (), _: (), _: (), _: (), _: (), _: ()) {
         rt.write_debug("Hello world 7");
     }
 
-    fn transition_8<R: Runtime>(
+    fn transition_8<R: CustomRuntime>(
         rt: &mut R,
         _: (),
         _: (),
@@ -335,7 +341,7 @@ mod tests {
         rt.write_debug("Hello world 8");
     }
 
-    fn transition_9<R: Runtime>(
+    fn transition_9<R: CustomRuntime>(
         rt: &mut R,
         _: (),
         _: (),
@@ -392,11 +398,11 @@ mod tests {
         _data: String,
     }
 
-    fn custom_transition<R: Runtime>(_: &mut R) {}
+    fn custom_transition<R: CustomRuntime>(_: &mut R) {}
 
     impl<R> IntoService<R, Vec<u8>, CustomService> for CustomService
     where
-        R: Runtime,
+        R: CustomRuntime,
     {
         fn into_service(self) -> Service<R, Vec<u8>, Self> {
             let mut service = Service::<R, Vec<u8>, Self>::new(self);

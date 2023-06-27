@@ -1,18 +1,20 @@
 use super::{
     service::{Input, IntoTransition, Runnable, Service},
-    FromRawInput, IntoService, Runtime,
+    CustomRuntime, FromRawInput, IntoService,
 };
+
+//use tezos_smart_rollup_host::runtime::Runtime;
 
 pub struct Application<'a, R>
 where
-    R: Runtime,
+    R: CustomRuntime,
 {
     runtime: &'a mut R,
     services: Vec<Box<dyn Runnable<R>>>,
     base: Service<R, Vec<u8>, ()>,
 }
 
-impl<'a, R: Runtime + 'static> Application<'a, R> {
+impl<'a, R: CustomRuntime + 'static> Application<'a, R> {
     pub fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
         F: IntoTransition<R, Vec<u8>, (), Marker> + 'static,
@@ -59,7 +61,7 @@ impl<'a, R: Runtime + 'static> Application<'a, R> {
 
 impl<'a, R> Application<'a, R>
 where
-    R: Runtime,
+    R: CustomRuntime,
 {
     pub fn new(runtime: &'a mut R) -> Self {
         Self {

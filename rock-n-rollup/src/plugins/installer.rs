@@ -1,4 +1,6 @@
-use crate::core::Runtime;
+//use tezos_smart_rollup_host::runtime::Runtime;
+
+use crate::core::CustomRuntime;
 
 pub trait Installer {
     // Install the kernel to /boot/kernel.wasm
@@ -7,7 +9,7 @@ pub trait Installer {
 
 impl<R> Installer for R
 where
-    R: Runtime,
+    R: CustomRuntime,
 {
     fn install(&mut self, kernel: &[u8]) -> Result<(), ()> {
         let path = "/tmp/boot/kernel.wasm";

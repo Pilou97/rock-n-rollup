@@ -1,4 +1,5 @@
-use crate::core::{FromInput, Input, Runtime};
+use crate::core::{CustomRuntime, FromInput, Input};
+//use tezos_smart_rollup_host::runtime::Runtime;
 
 pub trait FromExternal
 where
@@ -37,7 +38,7 @@ impl<T, S> FromInput<Vec<u8>, S> for External<T>
 where
     T: FromExternal,
 {
-    fn from_input<R: Runtime>(_: &mut R, input: &Input<Vec<u8>>, _: &S) -> Result<Self, ()> {
+    fn from_input<R: CustomRuntime>(_: &mut R, input: &Input<Vec<u8>>, _: &S) -> Result<Self, ()> {
         // First we need to make sure it starts by 0x01
         match input.payload[..] {
             [0x01, ..] => {
