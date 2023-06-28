@@ -55,9 +55,9 @@ pub fn ticket_transition<L: Logger>(
 }
 
 #[rock_n_rollup::main]
-pub fn main<R>(application: &mut Application<R>)
+pub fn main<R: tezos_smart_rollup_host::runtime::Runtime>(application: &mut Application<R>)
 where
-    R: tezos_smart_rollup_host::runtime::Runtime + 'static + rock_n_rollup::core::Runtime,
+    R: tezos_smart_rollup_host::runtime::Runtime,
 {
     application
         // .register(transition)

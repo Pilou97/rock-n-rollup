@@ -6,7 +6,7 @@ use super::{
 use crate::core::runtime::Runtime;
 //use tezos_smart_rollup_host::runtime::Runtime;
 
-pub struct Application<'a, R>
+pub struct Application<'a, R: Runtime>
 where
     R: Runtime,
 {

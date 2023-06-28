@@ -17,7 +17,10 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
             /// https://gitlab.com/tezos/tezos/-/blob/master/src/kernel_sdk/entrypoint/src/lib.rs
             /// Create a new RollupHost
             /// And give it to the KernelRuntime::new(rollup_host)
-            let mut runtime = rock_n_rollup::core::KernelRuntime::default();
+            use $crate::RollupHost;
+            //let mut runtime = rock_n_rollup::core::KernelRuntime::default();
+            let mut host = unsafe{RollupHost::new()};
+            let mut runtime = rock_n_rollup::core::KernelRuntime::new(host);
             let mut app = rock_n_rollup::core::Application::new(&mut runtime);
             #fn_name(&mut app);
         }
