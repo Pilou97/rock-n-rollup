@@ -1,12 +1,12 @@
 use super::{
     service::{Input, IntoTransition, Runnable, Service},
-    FromRawInput, IntoService,
+    FromRawInput, IntoService, Runtime,
 };
 
-use crate::core::runtime::Runtime;
+//use crate::core::runtime::Runtime;
 //use tezos_smart_rollup_host::runtime::Runtime;
 
-pub struct Application<'a, R: Runtime>
+pub struct Application<'a, R>
 where
     R: Runtime,
 {

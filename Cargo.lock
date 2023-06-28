@@ -800,7 +800,7 @@ name = "read-input"
 version = "0.1.0"
 dependencies = [
  "rock-n-rollup",
- "tezos-smart-rollup-host",
+ "tezos-smart-rollup-core",
 ]
 
 [[package]]
@@ -855,6 +855,7 @@ version = "0.0.2"
 dependencies = [
  "quote",
  "syn 2.0.15",
+ "tezos-smart-rollup-core",
 ]
 
 [[package]]

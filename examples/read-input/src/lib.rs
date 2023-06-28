@@ -54,10 +54,12 @@ pub fn ticket_transition<L: Logger>(
     logger.info(source);
 }
 
+use tezos_smart_rollup_core::rollup_host::RollupHost;
+
 #[rock_n_rollup::main]
-pub fn main<R: tezos_smart_rollup_host::runtime::Runtime>(application: &mut Application<R>)
+pub fn main<R>(application: &mut Application<R>)
 where
-    R: tezos_smart_rollup_host::runtime::Runtime,
+    R: rock_n_rollup::core::Runtime,
 {
     application
         // .register(transition)
