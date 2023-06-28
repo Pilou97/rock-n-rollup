@@ -3,7 +3,7 @@ use tezos_smart_rollup_encoding::{
     michelson::Michelson,
 };
 
-use crate::core::{CustomRuntime, FromInput, Input};
+use crate::core::{FromInput, Input, Runtime};
 //use tezos_smart_rollup_host::runtime::Runtime;
 
 pub trait FromInternal
@@ -126,7 +126,7 @@ where
 }
 
 impl<T: FromInternal, S> FromInput<Vec<u8>, S> for Internal<T> {
-    fn from_input<R: CustomRuntime>(_: &mut R, input: &Input<Vec<u8>>, _: &S) -> Result<Self, ()> {
+    fn from_input<R: Runtime>(_: &mut R, input: &Input<Vec<u8>>, _: &S) -> Result<Self, ()> {
         let payload = T::from_internal(&input.payload)?;
         Ok(Internal {
             level: input.level,

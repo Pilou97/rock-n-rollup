@@ -1,5 +1,5 @@
 use crate::{
-    core::{CustomRuntime, FromInput, Input, IntoService, Service},
+    core::{FromInput, Input, IntoService, Runtime, Service},
     plugins::{
         dac::{Dac, PreimageHash},
         installer::Installer,
@@ -26,7 +26,7 @@ impl TicketUpgrade {
 }
 
 impl FromInput<Vec<u8>, TicketUpgrade> for TicketUpgrade {
-    fn from_input<R: CustomRuntime>(
+    fn from_input<R: Runtime>(
         _: &mut R,
         _: &Input<Vec<u8>>,
         state: &TicketUpgrade,
@@ -57,7 +57,7 @@ fn upgrade_on_ticket<R: Logger + Dac + Installer>(
 
 impl<R> IntoService<R, Vec<u8>, TicketUpgrade> for TicketUpgrade
 where
-    R: CustomRuntime + 'static,
+    R: Runtime + 'static,
 {
     fn into_service(self) -> Service<R, Vec<u8>, Self> {
         let mut service = Service::<R, Vec<u8>, Self>::new(self);

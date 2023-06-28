@@ -1,7 +1,7 @@
 use rock_n_rollup::{
     core::{
         michelson::{ticket::Ticket, MichelsonBytes},
-        Application, Input, Runtime,
+        Application, Input,
     },
     plugins::logger::Logger,
     services::{
@@ -55,7 +55,10 @@ pub fn ticket_transition<L: Logger>(
 }
 
 #[rock_n_rollup::main]
-pub fn main<R: Runtime>(application: &mut Application<R>) {
+pub fn main<R>(application: &mut Application<R>)
+where
+    R: tezos_smart_rollup_host::runtime::Runtime + 'static + rock_n_rollup::core::Runtime,
+{
     application
         // .register(transition)
         // .register(string_transition)

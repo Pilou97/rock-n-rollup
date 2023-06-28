@@ -1,6 +1,6 @@
 //use tezos_smart_rollup_host::runtime::Runtime;
 
-use crate::core::CustomRuntime;
+use crate::core::Runtime;
 
 pub trait Logger {
     /// Logs to stdout
@@ -21,7 +21,7 @@ pub trait Logger {
 
 impl<T> Logger for T
 where
-    T: CustomRuntime,
+    T: Runtime,
 {
     fn log(&mut self, msg: &str) {
         self.write_debug(&format!("{}\n", msg));

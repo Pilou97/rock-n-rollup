@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use tezos_smart_rollup_host::{path::RefPath, runtime::Runtime};
+use tezos_smart_rollup_host::path::OwnedPath;
 
 use super::constants::PREIMAGE_HASH_SIZE;
 
@@ -76,7 +76,7 @@ extern "C" {
     ) -> i32;
 }
 
-pub trait CustomRuntime {
+pub trait Runtime: 'static {
     /// Print a message in the rollup stdout (if activated)
     fn write_debug(&mut self, msg: &str);
 
@@ -85,6 +85,13 @@ pub trait CustomRuntime {
 
     /// Returns true if something is present under the following path
     fn store_is_present(&mut self, path: &str) -> bool;
+
+    /// Returns
+    /// - 0: the key is missing
+    /// - 1: only a file is stored under the path
+    /// - 2: only directories under the path
+    /// - 3: both a file and directories
+    //fn store_has(&mut self, path: &str) -> Result<(), ()>;
 
     /// Deletes the path at the following location
     fn store_delete(&mut self, path: &str) -> Result<(), ()>;
@@ -108,30 +115,30 @@ pub trait CustomRuntime {
 #[derive(Default)]
 pub struct KernelRuntime<R>
 where
-    R: Runtime,
+    R: tezos_smart_rollup_host::runtime::Runtime + 'static,
 {
     host: R,
 }
 
 impl<R> KernelRuntime<R>
 where
-    R: Runtime,
+    R: tezos_smart_rollup_host::runtime::Runtime,
 {
     pub fn new(host: R) -> Self {
         Self { host }
     }
 }
 
-impl<R> CustomRuntime for KernelRuntime<R>
+impl<R> Runtime for KernelRuntime<R>
 where
-    R: Runtime,
+    R: tezos_smart_rollup_host::runtime::Runtime,
 {
     fn write_debug(&mut self, msg: &str) {
         self.host.write_debug(msg)
     }
 
     fn store_delete(&mut self, path: &str) -> Result<(), ()> {
-        let path = RefPath::assert_from(path.as_bytes());
+        let path = OwnedPath::try_from(path.to_string()).map_err(|_| ())?;
 
         let res = self.host.store_delete(&path);
         match res {
@@ -141,17 +148,22 @@ where
     }
 
     fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>> {
-        let path = RefPath::assert_from(path.as_bytes());
-
-        let res = self.host.store_read(&path, offset, size);
-        match res {
-            Ok(t) => Some(t),
+        let path = OwnedPath::try_from(path.to_string()).map_err(|_| ());
+        match path {
+            Ok(path) => {
+                let res = self.host.store_read(&path, offset, size);
+                match res {
+                    Ok(t) => Some(t),
+                    Err(_) => None,
+                }
+            }
             Err(_) => None,
         }
     }
 
     fn store_write(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
-        let path = RefPath::assert_from(path.as_bytes());
+        let path = OwnedPath::try_from(path.to_string()).map_err(|_| ())?;
+
         let res = self.host.store_write(&path, data, at_offset);
         match res {
             Ok(_) => Ok(()),
@@ -160,8 +172,8 @@ where
     }
 
     fn store_move(&mut self, from: &str, to: &str) -> Result<(), ()> {
-        let from = RefPath::assert_from(from.as_bytes());
-        let to = RefPath::assert_from(to.as_bytes());
+        let from = OwnedPath::try_from(from.to_string()).map_err(|_| ())?;
+        let to = OwnedPath::try_from(to.to_string()).map_err(|_| ())?;
 
         let res = self.host.store_move(&from, &to);
         match res {
@@ -198,6 +210,8 @@ where
         // Placeholder values
         let mut message_info = ReadInputMessageInfo { level: 0, id: 0 };
 
+        // payload is buffer
+        // message_info is message info
         let size = unsafe { read_input(&mut message_info, payload.as_mut_ptr(), MAX_MESSAGE_SIZE) };
 
         if size == 0 {
@@ -264,7 +278,7 @@ impl MockRuntime {
     }
 }
 
-impl CustomRuntime for MockRuntime {
+impl Runtime for MockRuntime {
     fn write_debug(&mut self, msg: &str) {
         self.stdout.push(msg.to_string());
     }

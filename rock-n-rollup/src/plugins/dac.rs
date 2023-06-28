@@ -1,4 +1,4 @@
-use crate::core::{CustomRuntime, PREIMAGE_HASH_SIZE};
+use crate::core::{Runtime, PREIMAGE_HASH_SIZE};
 //use tezos_smart_rollup_host::runtime::Runtime;
 
 pub struct PreimageHash {
@@ -166,7 +166,7 @@ impl<'a> TryFrom<&'a [u8]> for SlicePage<'a> {
 /// `save_content` is applied on each content page found.
 ///
 /// N.B `max_dac_levels`, should probably be kept under 4 (4 gives 7.9GB of data approximately)
-pub fn reveal_loop<Host: CustomRuntime>(
+pub fn reveal_loop<Host: Runtime>(
     host: &mut Host,
     level: usize,
     hash: &PreimageHash,
@@ -205,7 +205,7 @@ pub trait Dac {
 
 impl<R> Dac for R
 where
-    R: CustomRuntime,
+    R: Runtime,
 {
     fn read_from_dac(&mut self, hash: &PreimageHash) -> Result<Vec<u8>, ()> {
         let mut data = Vec::default();

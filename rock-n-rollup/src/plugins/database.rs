@@ -2,7 +2,7 @@ use std::mem::size_of;
 
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::core::CustomRuntime;
+use crate::core::Runtime;
 
 //use tezos_smart_rollup_host::runtime::Runtime;
 
@@ -50,7 +50,7 @@ impl Backend for Bincode {
     where
         P: DeserializeOwned,
     {
-        bincode::deserialize(&bytes).map_err(|_| ())
+        bincode::deserialize(bytes).map_err(|_| ())
     }
 }
 
@@ -75,7 +75,7 @@ where
 
 impl<R, B> Database<B> for R
 where
-    R: CustomRuntime,
+    R: Runtime,
     B: Backend,
 {
     fn get<D>(&mut self, path: &str) -> Result<Option<D>, ()>

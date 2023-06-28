@@ -1,7 +1,7 @@
 use base58::{FromBase58, ToBase58};
 use sha2::{Digest, Sha256};
 
-use crate::{core::CustomRuntime, plugins::hasher::Hasher};
+use crate::{core::Runtime, plugins::hasher::Hasher};
 //use tezos_smart_rollup_host::runtime::Runtime;
 
 /// TODO: extract this function in the core module
@@ -81,7 +81,7 @@ pub trait Verifier {
 
 impl<R> Verifier for R
 where
-    R: CustomRuntime + Hasher,
+    R: Runtime + Hasher,
 {
     fn verify_signature(
         &mut self,

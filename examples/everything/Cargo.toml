@@ -10,3 +10,4 @@ crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 rock-n-rollup = {path = "../../rock-n-rollup"}
+tezos-smart-rollup-host = "0.2.0"

@@ -3,7 +3,7 @@ use serde::de::DeserializeOwned;
 //use tezos_smart_rollup_host::runtime::Runtime;
 
 use crate::{
-    core::{CustomRuntime, FromInput, FromRawInput},
+    core::{FromInput, FromRawInput, Runtime},
     plugins::{
         crypto::{PublicKey, Signature, Verifier},
         database::{Bincode, Database},
@@ -137,7 +137,7 @@ impl<P, S> FromInput<RawExternalOperation, S> for Json<P>
 where
     P: DeserializeOwned,
 {
-    fn from_input<R: CustomRuntime>(
+    fn from_input<R: Runtime>(
         _: &mut R,
         input: &crate::core::Input<RawExternalOperation>,
         _: &S,
@@ -153,13 +153,13 @@ where
 #[cfg(test)]
 mod tests {
 
-    use crate::core::{CustomRuntime, MockRuntime, Service};
+    use crate::core::{MockRuntime, Runtime, Service};
     use serde::Deserialize;
     //use tezos_smart_rollup_host::runtime::Runtime;
 
     use super::{try_from_bytes, Json, RawExternalOperation};
 
-    fn transition<R: CustomRuntime>(rt: &mut R, _: RawExternalOperation) {
+    fn transition<R: Runtime>(rt: &mut R, _: RawExternalOperation) {
         rt.write_debug("Hello {source}")
     }
 
@@ -169,7 +169,7 @@ mod tests {
         Pong,
     }
 
-    fn transition_2<R: CustomRuntime>(_: &mut R, msg: Json<PingPong>) {
+    fn transition_2<R: Runtime>(_: &mut R, msg: Json<PingPong>) {
         let _msg = msg.payload;
     }
 

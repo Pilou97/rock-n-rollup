@@ -382,6 +382,7 @@ name = "everything"
 version = "0.1.0"
 dependencies = [
  "rock-n-rollup",
+ "tezos-smart-rollup-host",
 ]
 
 [[package]]
@@ -799,6 +800,7 @@ name = "read-input"
 version = "0.1.0"
 dependencies = [
  "rock-n-rollup",
+ "tezos-smart-rollup-host",
 ]
 
 [[package]]
