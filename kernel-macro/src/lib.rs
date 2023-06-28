@@ -2,8 +2,6 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, ItemFn};
 
-use tezos_smart_rollup_core::rollup_host::RollupHost;
-
 // procedural macros allow to define custom attribute-like syntax
 // and perform code transformations at compile-time
 #[proc_macro_attribute]
@@ -34,7 +32,7 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
             /// And give it to the KernelRuntime::new(rollup_host)
             //let mut runtime = rock_n_rollup::core::KernelRuntime::default();
             //use $crate::tezos_smart_rollup_core::RollupHost;
-            let mut host = unsafe{RollupHost::new()};
+            let mut host = unsafe{tezos_smart_rollup_core::rollup_host::RollupHost::new()};
             let mut runtime = rock_n_rollup::core::KernelRuntime::new(host);
             let mut app = rock_n_rollup::core::Application::new(&mut runtime);
 
