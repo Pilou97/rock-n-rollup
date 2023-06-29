@@ -163,20 +163,11 @@ where
     }
 }
 
+#[derive(Default)]
 pub struct MockRuntime {
     stdout: Vec<String>,
     inputs: Vec<RawInput>,
     storage: HashMap<String, Vec<u8>>,
-}
-
-impl Default for MockRuntime {
-    fn default() -> Self {
-        Self {
-            stdout: Vec::default(),
-            inputs: Vec::default(),
-            storage: HashMap::default(),
-        }
-    }
 }
 
 impl MockRuntime {
