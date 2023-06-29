@@ -1,5 +1,5 @@
 use rock_n_rollup::{
-    core::{Application, CustomRuntime},
+    core::Application,
     plugins::database::{Database, Json},
 };
 
@@ -13,6 +13,9 @@ pub fn hello<R: Database<Json>>(rt: &mut R) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<R: CustomRuntime>(application: &mut Application<R: CustomRuntime>) {
+pub fn main<R>(application: &mut Application<R>)
+where
+    R: rock_n_rollup::core::Runtime,
+{
     application.register(hello).run();
 }

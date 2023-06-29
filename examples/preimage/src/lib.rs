@@ -1,5 +1,5 @@
 use rock_n_rollup::{
-    core::{Application, Runtime},
+    core::Application,
     plugins::{
         dac::{Dac, PreimageHash},
         logger::Logger,
@@ -26,6 +26,9 @@ pub fn hello<R: Dac + Logger>(rt: &mut R, _: External<Vec<u8>>) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<R: Runtime>(application: &mut Application<R>) {
+pub fn main<R>(application: &mut Application<R>)
+where
+    R: rock_n_rollup::core::Runtime,
+{
     application.register(hello).run();
 }

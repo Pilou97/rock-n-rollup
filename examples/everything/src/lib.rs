@@ -1,5 +1,5 @@
 use rock_n_rollup::{
-    core::{Application, Runtime},
+    core::Application,
     plugins::logger::Logger,
     services::external::{External, FromExternal},
 };
@@ -26,6 +26,9 @@ pub fn hello<L: Logger>(logger: &mut L, _ping_pong: External<PingPong>) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<R: Runtime>(application: &mut Application<R>) {
+pub fn main<R>(application: &mut Application<R>)
+where
+    R: rock_n_rollup::core::Runtime,
+{
     application.register(hello).run();
 }

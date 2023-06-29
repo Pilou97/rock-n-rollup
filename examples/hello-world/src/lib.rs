@@ -43,7 +43,10 @@ pub fn decrement<R: Runtime>(rt: &mut R, _: External<Decrement>) {}
 // }
 
 #[rock_n_rollup::main]
-pub fn main<R: Runtime>(application: &mut Application<R>) {
+pub fn main<R>(application: &mut Application<R>)
+where
+    R: rock_n_rollup::core::Runtime,
+{
     application
         .register(on_start)
         .register(increment)
