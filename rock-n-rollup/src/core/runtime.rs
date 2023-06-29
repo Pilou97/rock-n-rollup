@@ -19,63 +19,6 @@ pub struct ReadInputMessageInfo {
     pub id: i32,
 }
 
-#[link(wasm_import_module = "smart_rollup_core")]
-extern "C" {
-    /// Does nothing. Does not check the correctness of its argument.
-    pub fn write_debug(src: *const u8, num_bytes: usize);
-
-    pub fn read_input(
-        message_info: *mut ReadInputMessageInfo,
-        dst: *mut u8,
-        max_bytes: usize,
-    ) -> i32;
-
-    /// Returns
-    /// - 0 the key is missing
-    /// - 1 only a file is stored under the path
-    /// - 2 only directories under the path
-    /// - 3 both a file and directories
-    pub fn store_has(path: *const u8, path_len: usize) -> i32;
-
-    /// Returns 0 in case of success, or an error code
-    pub fn store_delete(path: *const u8, path_len: usize) -> i32;
-
-    /// Returns the number of bytes written to the durable storage
-    /// (should be equal to `num_bytes`, or an error code).
-    pub fn store_read(
-        path: *const u8,
-        path_len: usize,
-        offset: usize,
-        dst: *mut u8,
-        num_bytes: usize,
-    ) -> i32;
-
-    /// Returns 0 in case of success, or an error code.
-    pub fn store_write(
-        path: *const u8,
-        path_len: usize,
-        offset: usize,
-        src: *const u8,
-        num_bytes: usize,
-    ) -> i32;
-
-    /// Returns the number of bytes written at `dst`, or an error code.
-    pub fn reveal_preimage(
-        hash_addr: *const u8,
-        hash_size: u8,
-        dst: *mut u8,
-        max_bytes: usize,
-    ) -> i32;
-
-    /// Returns 0 in case of success, or an error code.
-    pub fn store_move(
-        src_path: *const u8,
-        scr_path_len: usize,
-        dst_path: *const u8,
-        dst_path_len: usize,
-    ) -> i32;
-}
-
 pub trait Runtime: 'static {
     /// Print a message in the rollup stdout (if activated)
     fn write_debug(&mut self, msg: &str);
@@ -85,13 +28,6 @@ pub trait Runtime: 'static {
 
     /// Returns true if something is present under the following path
     fn store_is_present(&mut self, path: &str) -> bool;
-
-    /// Returns
-    /// - 0: the key is missing
-    /// - 1: only a file is stored under the path
-    /// - 2: only directories under the path
-    /// - 3: both a file and directories
-    //fn store_has(&mut self, path: &str) -> Result<(), ()>;
 
     /// Deletes the path at the following location
     fn store_delete(&mut self, path: &str) -> Result<(), ()>;
@@ -193,53 +129,39 @@ where
     }
 
     fn store_is_present(&mut self, path: &str) -> bool {
-        let ptr = path.as_ptr();
-        let res = unsafe { store_has(ptr, path.len()) };
-        match res {
-            0 => false, // No file
-            1 => true,  // Only file
-            2 => true,  // Only directory
-            3 => true,  // Directory + File
-            _ => false,
+        let path = OwnedPath::try_from(path.to_string()).map_err(|_| ());
+        match path {
+            Ok(path) => {
+                let res = unsafe { self.host.store_has(&path) };
+                match res {
+                    Ok(Some(value_type)) => match value_type {
+                        tezos_smart_rollup_host::runtime::ValueType::Subtree => true,
+                        tezos_smart_rollup_host::runtime::ValueType::ValueWithSubtree => true,
+                        tezos_smart_rollup_host::runtime::ValueType::Value => true,
+                        tezos_smart_rollup_host::runtime::ValueType::ValueWithSubtree => true,
+                    },
+                    Ok(None) => false, // no file
+                    Err(_None) => false,
+                }
+            }
+            Err(_) => false,
         }
     }
 
     fn next_input(&mut self) -> Option<RawInput> {
-        let mut payload = Vec::with_capacity(MAX_MESSAGE_SIZE);
+        let size = { self.host.read_input() };
 
-        // Placeholder values
-        let mut message_info = ReadInputMessageInfo { level: 0, id: 0 };
-
-        // payload is buffer
-        // message_info is message info
-        let size = unsafe { read_input(&mut message_info, payload.as_mut_ptr(), MAX_MESSAGE_SIZE) };
-
-        if size == 0 {
-            None
-        } else {
-            unsafe { payload.set_len(size as usize) };
-            Some(RawInput {
-                level: message_info.level as u32,
-                id: message_info.id as u32,
-                payload,
-            })
+        match size {
+            Ok(Some(msg)) => Some(RawInput {
+                level: msg.level,
+                id: msg.id,
+                payload: msg.as_ref().to_vec(),
+            }),
+            Ok(None) => None,
+            Err(_) => None,
         }
     }
 }
-
-/* Q: modify
-#[derive(Default)]
-pub struct KernelRuntime {}*/
-
-/// First: rename Runtime into CustomRuntime
-/// Second step:
-/// KernelRuntime<'a, Rt: impl Runtime> { // The one from tezos-smart-rollup
-///    runtime: &'a, mut Rt
-/// }
-/// Third step:
-/// Adapt the following implementation: impl CustomRuntime for KernelRuntime
-///
-/// Last step: remove code starting line 21
 
 pub struct MockRuntime {
     stdout: Vec<String>,
