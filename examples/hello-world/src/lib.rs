@@ -1,14 +1,14 @@
-use rock_n_rollup::{
-    core::{Application, Runtime},
-    plugins::logger::Logger,
-};
+use rock_n_rollup::{core::Application, plugins::logger::Logger};
 
 pub fn hello<L: Logger>(logger: &mut L) {
     logger.log("Hello world");
 }
 
 #[rock_n_rollup::main]
-pub fn main<R: Runtime>(application: &mut Application<R>) {
+pub fn main<R>(application: &mut Application<R>)
+where
+    R: rock_n_rollup::core::Runtime,
+{
     application.register(hello).run();
 }
 
@@ -25,7 +25,7 @@ mod tests {
 
         let mut application = Application::new(&mut runtime);
 
-        let () = main(&mut application);
+        main(&mut application);
 
         assert_eq!(runtime.stdout(), vec!["Hello world\n"]);
     }

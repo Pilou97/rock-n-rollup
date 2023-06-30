@@ -12,7 +12,7 @@ where
     base: Service<R, Vec<u8>, ()>,
 }
 
-impl<'a, R: Runtime + 'static> Application<'a, R> {
+impl<'a, R: Runtime> Application<'a, R> {
     pub fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
         F: IntoTransition<R, Vec<u8>, (), Marker> + 'static,
