@@ -3,9 +3,6 @@ use super::{
     FromRawInput, IntoService, Runtime,
 };
 
-//use crate::core::runtime::Runtime;
-//use tezos_smart_rollup_host::runtime::Runtime;
-
 pub struct Application<'a, R>
 where
     R: Runtime,
@@ -15,7 +12,7 @@ where
     base: Service<R, Vec<u8>, ()>,
 }
 
-impl<'a, R: Runtime + 'static> Application<'a, R> {
+impl<'a, R: Runtime> Application<'a, R> {
     pub fn register<F, Marker>(&mut self, transition: F) -> &mut Self
     where
         F: IntoTransition<R, Vec<u8>, (), Marker> + 'static,

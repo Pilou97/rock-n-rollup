@@ -858,7 +858,6 @@ version = "0.0.2"
 dependencies = [
  "quote",
  "syn 2.0.15",
- "tezos-smart-rollup-core",
 ]
 
 [[package]]

@@ -4,8 +4,6 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use crate::core::Runtime;
 
-//use tezos_smart_rollup_host::runtime::Runtime;
-
 pub trait Backend {
     fn to_bytes<P>(data: &P) -> Result<Vec<u8>, ()>
     where

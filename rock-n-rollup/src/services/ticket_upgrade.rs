@@ -8,7 +8,6 @@ use crate::{
 };
 
 use tezos_smart_rollup_encoding::michelson::{ticket::Ticket, MichelsonBytes};
-//use tezos_smart_rollup_host::runtime::Runtime;
 
 use super::internal::{Internal, Transfer};
 
@@ -57,7 +56,7 @@ fn upgrade_on_ticket<R: Logger + Dac + Installer>(
 
 impl<R> IntoService<R, Vec<u8>, TicketUpgrade> for TicketUpgrade
 where
-    R: Runtime + 'static,
+    R: Runtime,
 {
     fn into_service(self) -> Service<R, Vec<u8>, Self> {
         let mut service = Service::<R, Vec<u8>, Self>::new(self);

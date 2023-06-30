@@ -1,7 +1,5 @@
 use serde::de::DeserializeOwned;
 
-//use tezos_smart_rollup_host::runtime::Runtime;
-
 use crate::{
     core::{FromInput, FromRawInput, Runtime},
     plugins::{
@@ -155,7 +153,6 @@ mod tests {
 
     use crate::core::{MockRuntime, Runtime, Service};
     use serde::Deserialize;
-    //use tezos_smart_rollup_host::runtime::Runtime;
 
     use super::{try_from_bytes, Json, RawExternalOperation};
 

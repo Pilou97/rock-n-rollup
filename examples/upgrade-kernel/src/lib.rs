@@ -7,10 +7,7 @@ fn transition<R: Logger>(rt: &mut R) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<R>(application: &mut Application<R>)
-where
-    R: rock_n_rollup::core::Runtime,
-{
+pub fn main<R: rock_n_rollup::core::Runtime>(application: &mut Application<R>) {
     application
         .service(TicketUpgrade::new("KT1CM7YzV9PaKX8u7HKM7vgey3Bbn6ZpZvWZ"))
         .register(transition)

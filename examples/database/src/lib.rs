@@ -13,9 +13,6 @@ pub fn hello<R: Database<Json>>(rt: &mut R) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<R>(application: &mut Application<R>)
-where
-    R: rock_n_rollup::core::Runtime,
-{
+pub fn main<R: rock_n_rollup::core::Runtime>(application: &mut Application<R>) {
     application.register(hello).run();
 }

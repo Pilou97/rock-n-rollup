@@ -55,10 +55,7 @@ pub fn ticket_transition<L: Logger>(
 }
 
 #[rock_n_rollup::main]
-pub fn main<R>(application: &mut Application<R>)
-where
-    R: rock_n_rollup::core::Runtime,
-{
+pub fn main<R: rock_n_rollup::core::Runtime>(application: &mut Application<R>) {
     application
         // .register(transition)
         // .register(string_transition)

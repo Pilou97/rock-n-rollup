@@ -9,8 +9,7 @@ use syn::{parse_macro_input, ItemFn};
 // it takes 2 paramters, representing the attribute arguments
 // and annotated function's code and return a TokenStream
 pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
-    // Parse the input tokens into a syntax tree representing a function.
-    // Or take the input token stream and performs the neccessary parsing
+    // Take the input token stream and performs the neccessary parsing
     // and validation to convert it into a Rust syntax tree.
     let input_fn = parse_macro_input!(input as ItemFn);
 
@@ -19,19 +18,13 @@ pub fn main(_: TokenStream, input: TokenStream) -> TokenStream {
     // the clone method is used to create a clone of the function name
     let fn_name = input_fn.sig.ident.clone();
 
-    // quote macro to generate the tranformed code.
+    // quote macro to generate the transformed code.
     // it constructs a syntax tree using the provided tokens inside the quote block.
     // the generated code includes the transformed function definition and
     // additional function named 'kernel_run'
     let output = quote! {
         #[export_name = "kernel_run"]
         pub extern "C" fn kernel_run() {
-            /// Maybe you can see the implementation of
-            /// https://gitlab.com/tezos/tezos/-/blob/master/src/kernel_sdk/entrypoint/src/lib.rs
-            /// Create a new RollupHost
-            /// And give it to the KernelRuntime::new(rollup_host)
-            //let mut runtime = rock_n_rollup::core::KernelRuntime::default();
-            //use $crate::tezos_smart_rollup_core::RollupHost;
             let mut host = unsafe{tezos_smart_rollup_core::rollup_host::RollupHost::new()};
             let mut runtime = rock_n_rollup::core::KernelRuntime::new(host);
             let mut app = rock_n_rollup::core::Application::new(&mut runtime);
