@@ -1,5 +1,5 @@
 use rock_n_rollup::{
-    core::{Application, Runtime},
+    core::Application,
     plugins::database::{Database, Json},
 };
 
@@ -13,6 +13,6 @@ pub fn hello<R: Database<Json>>(rt: &mut R) {
 }
 
 #[rock_n_rollup::main]
-pub fn main<R: Runtime>(application: &mut Application<R>) {
+pub fn main<R: rock_n_rollup::core::Runtime>(application: &mut Application<R>) {
     application.register(hello).run();
 }

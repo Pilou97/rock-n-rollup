@@ -1,7 +1,7 @@
 use serde::de::DeserializeOwned;
 
 use crate::{
-    core::{FromInput, FromRawInput},
+    core::{FromInput, FromRawInput, Runtime},
     plugins::{
         crypto::{PublicKey, Signature, Verifier},
         database::{Bincode, Database},
@@ -135,7 +135,7 @@ impl<P, S> FromInput<RawExternalOperation, S> for Json<P>
 where
     P: DeserializeOwned,
 {
-    fn from_input<R: crate::core::Runtime>(
+    fn from_input<R: Runtime>(
         _: &mut R,
         input: &crate::core::Input<RawExternalOperation>,
         _: &S,
@@ -151,9 +151,8 @@ where
 #[cfg(test)]
 mod tests {
 
-    use serde::Deserialize;
-
     use crate::core::{MockRuntime, Runtime, Service};
+    use serde::Deserialize;
 
     use super::{try_from_bytes, Json, RawExternalOperation};
 

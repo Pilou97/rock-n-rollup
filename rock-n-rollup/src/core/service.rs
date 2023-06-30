@@ -1,4 +1,5 @@
-use super::{RawInput, Runtime};
+use super::RawInput;
+use crate::core::runtime::Runtime;
 
 #[derive(Clone)]
 pub struct Input<P> {
@@ -269,7 +270,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::core::{runtime::MockRuntime, Application, Runtime};
+    use crate::core::{runtime::MockRuntime, runtime::Runtime, Application};
 
     use super::{FromInput, IntoService, Service};
 

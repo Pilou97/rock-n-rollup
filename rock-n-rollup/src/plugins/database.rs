@@ -48,7 +48,7 @@ impl Backend for Bincode {
     where
         P: DeserializeOwned,
     {
-        bincode::deserialize(&bytes).map_err(|_| ())
+        bincode::deserialize(bytes).map_err(|_| ())
     }
 }
 
