@@ -1,5 +1,4 @@
 use crate::core::{FromInput, Input, Runtime};
-//use tezos_smart_rollup_host::runtime::Runtime;
 
 pub trait FromExternal
 where

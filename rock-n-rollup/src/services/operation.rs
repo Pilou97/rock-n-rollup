@@ -1,7 +1,5 @@
 use serde::de::DeserializeOwned;
 
-//use tezos_smart_rollup_host::runtime::Runtime;
-
 use crate::{
     core::{FromInput, FromRawInput, Runtime},
     plugins::{

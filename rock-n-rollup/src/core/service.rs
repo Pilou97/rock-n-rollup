@@ -1,5 +1,4 @@
 use super::RawInput;
-//use tezos_smart_rollup_host::runtime::Runtime;
 use crate::core::runtime::Runtime;
 
 #[derive(Clone)]

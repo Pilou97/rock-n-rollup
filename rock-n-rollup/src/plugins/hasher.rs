@@ -3,8 +3,6 @@ use blake2::Blake2bVar;
 
 use crate::core::Runtime;
 
-//use tezos_smart_rollup_host::runtime::Runtime;
-
 #[derive(PartialEq, Eq, Debug)]
 pub struct Blake2b512([u8; 64]);
 

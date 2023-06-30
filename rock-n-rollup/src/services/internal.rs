@@ -4,7 +4,6 @@ use tezos_smart_rollup_encoding::{
 };
 
 use crate::core::{FromInput, Input, Runtime};
-//use tezos_smart_rollup_host::runtime::Runtime;
 
 pub trait FromInternal
 where

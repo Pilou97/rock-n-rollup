@@ -4,8 +4,6 @@ use rock_n_rollup::{
     services::external::{External, FromExternal},
 };
 
-//use tezos_smart_rollup_host::runtime::Runtime;
-
 pub enum PingPong {
     Ping,
     Pong,

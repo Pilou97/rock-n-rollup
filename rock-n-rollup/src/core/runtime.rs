@@ -13,12 +13,6 @@ pub struct RawInput {
     pub payload: Vec<u8>,
 }
 
-#[repr(C)]
-pub struct ReadInputMessageInfo {
-    pub level: i32,
-    pub id: i32,
-}
-
 pub trait Runtime: 'static {
     /// Print a message in the rollup stdout (if activated)
     fn write_debug(&mut self, msg: &str);
@@ -79,22 +73,17 @@ where
         let res = self.host.store_delete(&path);
         match res {
             Ok(_) => Ok(()),
-            Err(_) => Err(print!("Error store_delete")),
+            Err(_) => {
+                self.host.write_debug("Error store_delete");
+                Err(())
+            }
         }
     }
 
     fn store_read(&mut self, path: &str, offset: usize, size: usize) -> Option<Vec<u8>> {
-        let path = OwnedPath::try_from(path.to_string()).map_err(|_| ());
-        match path {
-            Ok(path) => {
-                let res = self.host.store_read(&path, offset, size);
-                match res {
-                    Ok(t) => Some(t),
-                    Err(_) => None,
-                }
-            }
-            Err(_) => None,
-        }
+        let path = OwnedPath::try_from(path.to_string()).map_err(|_| ()).ok()?;
+
+        self.host.store_read(&path, offset, size).ok()
     }
 
     fn store_write(&mut self, path: &str, data: &[u8], at_offset: usize) -> Result<(), ()> {
@@ -103,7 +92,10 @@ where
         let res = self.host.store_write(&path, data, at_offset);
         match res {
             Ok(_) => Ok(()),
-            Err(_) => Err(print!("Error store_write")),
+            Err(_) => {
+                self.host.write_debug("Error store_write");
+                Err(())
+            }
         }
     }
 
@@ -114,7 +106,10 @@ where
         let res = self.host.store_move(&from, &to);
         match res {
             Ok(_) => Ok(()),
-            Err(_) => Err(print!("Error store_move")),
+            Err(_) => {
+                self.host.write_debug("Error store_move");
+                Err(())
+            }
         }
     }
 
@@ -124,7 +119,10 @@ where
         let res: Result<usize, _> = self.host.reveal_preimage(hash, &mut payload);
         match res {
             Ok(bytes) => Ok(bytes.to_le_bytes().to_vec()),
-            Err(_) => Err(print!("Error reveal_preimage")),
+            Err(_) => {
+                self.host.write_debug("Error reveal_preimage");
+                Err(())
+            }
         }
     }
 
@@ -132,16 +130,11 @@ where
         let path = OwnedPath::try_from(path.to_string()).map_err(|_| ());
         match path {
             Ok(path) => {
-                let res = unsafe { self.host.store_has(&path) };
+                let res = { self.host.store_has(&path) };
                 match res {
-                    Ok(Some(value_type)) => match value_type {
-                        tezos_smart_rollup_host::runtime::ValueType::Subtree => true,
-                        tezos_smart_rollup_host::runtime::ValueType::ValueWithSubtree => true,
-                        tezos_smart_rollup_host::runtime::ValueType::Value => true,
-                        tezos_smart_rollup_host::runtime::ValueType::ValueWithSubtree => true,
-                    },
+                    Ok(Some(_value_type)) => true,
                     Ok(None) => false, // no file
-                    Err(_None) => false,
+                    Err(_) => false,
                 }
             }
             Err(_) => false,
@@ -149,7 +142,7 @@ where
     }
 
     fn next_input(&mut self) -> Option<RawInput> {
-        let size = { self.host.read_input() };
+        let size = self.host.read_input();
 
         match size {
             Ok(Some(msg)) => Some(RawInput {

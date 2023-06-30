@@ -1,5 +1,4 @@
 use crate::core::{Runtime, PREIMAGE_HASH_SIZE};
-//use tezos_smart_rollup_host::runtime::Runtime;
 
 pub struct PreimageHash {
     inner: [u8; PREIMAGE_HASH_SIZE],
