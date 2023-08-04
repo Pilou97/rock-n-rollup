@@ -11,8 +11,10 @@ An easy way to execute a transition of this kind of message is to add a paramete
 
 ```rust, noplayground
 # extern crate rock_n_rollup;
-use rock_n_rollup::services::internal::*;
 use rock_n_rollup::core::Runtime;
+use rock_n_rollup::services::internal::*;
+use rock_n_rollup::core::michelson::*;
+use rock_n_rollup::core::michelson::ticket::*;
 
 fn start_of_level<R: Runtime>(rt: &mut R, msg: Internal<StartOfLevel>) {
     // Only executed on StartOfLevel message
@@ -29,7 +31,7 @@ fn end_of_level<R: Runtime>(rt: &mut R, msg: Internal<EndOfLevel>) {
     // ...
 }
 
-fn transfer<R: Runtime>(rt: &mut R, msg: Internal<Transfer<Vec<u8>>>){
+fn transfer<R: Runtime>(rt: &mut R, msg: Internal<Transfer<Ticket<MichelsonBytes>>>) {
     // Only excuted on Transfer
     // ...
 }

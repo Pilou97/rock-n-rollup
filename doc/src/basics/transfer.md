@@ -29,13 +29,13 @@ use rock_n_rollup::core::{Runtime, Application};
 # use rock_n_rollup::core::michelson::*;
 # use rock_n_rollup::core::michelson::ticket::*;
 
-# fn transfer<R: Runtime>(rt: &mut R, msg: Internal<Transfer<Ticket<MichelsonBytes>>>) {
-#     let transfer = msg.payload();
-#     let ticket = transfer.payload();
-#     let destination = transfer.destination();
-#     let source = transfer.source();
-#     let sender = transfer.sender();
-# }
+fn transfer<R: Runtime>(rt: &mut R, msg: Internal<Transfer<Ticket<MichelsonBytes>>>) {
+    let transfer = msg.payload();
+    let ticket = transfer.payload();
+    let destination = transfer.destination();
+    let source = transfer.source();
+    let sender = transfer.sender();
+}
 
 #[rock_n_rollup::main]
 pub fn kernel_entry<R: Runtime>(application: &mut Application<R>) {
